@@ -21,10 +21,36 @@ def filterStopWords(self, words):
 
 def readFiles(directoryName):
 	dataList = []
-	for fileName in os.listdir(directoryName):
-		fileName = os.path.join(directoryName, fileName)
-		dataFile = open(fileName, 'r')
-		dataList.append(({'text': dataFile, 'type': 'speech'}), random.randint(-1, 1))
+	if directoryName == '../cs221-data/congressional-votes-small'
+		for fileName in os.listdir(directoryName):
+			fileName = os.path.join(directoryName, fileName)
+			dataFile = open(fileName, 'r')
+			dataList.append(({'text': dataFile, 'type': 'speech'}), random.randint(-1, 1))
+
+
+	firstLine = True
+	if directoryName == '../cs221-data/fake-data'
+		for fileName in os.listdir(directoryName):
+			fileName = os.path.join(directoryName, fileName)
+			dataFile = open(fileName, 'r')
+			for line in dataFile:
+				if firstLine:
+					firstLine = False
+				else:
+					#read the data
+					#dataList.append(({'text': dataFile, 'type': 'speech'}), random.randint(-1, 1))
+
+	firstLine = True
+	if directoryName == '../cs221-data/read-data'
+		for fileName in os.listdir(directoryName):
+			fileName = os.path.join(directoryName, fileName)
+			dataFile = open(fileName, 'r')
+			for line in dataFile:
+				if firstLine:
+					firstLine = False
+				else:
+					# read the data
+					#dataList.append(({'text': dataFile, 'type': 'speech'}), random.randint(-1, 1))
 
 
 
