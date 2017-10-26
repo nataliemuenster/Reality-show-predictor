@@ -6,6 +6,7 @@ import math
 import sys
 import numpy as np
 import os
+import csv
 import random
 
 stopList = set(readFile('./english.stop'))
@@ -32,26 +33,39 @@ def readFiles(directoryName):
 	if directoryName == '../cs221-data/fake-data'
 		for fileName in os.listdir(directoryName):
 			fileName = os.path.join(directoryName, fileName)
-			dataFile = open(fileName, 'r')
-			for line in dataFile:
-				if firstLine:
-					firstLine = False
-				else:
-					#read the data
-					#dataList.append(({'text': dataFile, 'type': 'speech'}), random.randint(-1, 1))
-
+			with open(fileName, 'rb') as csvfile:
+				reader = csv.reader(csvfile)
+				for line in reader:
+					if firstLine:
+						firstLine = False
+					else:
+						dataList.append(({
+								'author': line[2],
+								'published': line[3],
+								'title': line[4],
+								'text': line[5],
+								'site_url': line[7]
+								'type': line[18]
+							}, random.randint(-1, 1)))
+						
 	firstLine = True
 	if directoryName == '../cs221-data/read-data'
 		for fileName in os.listdir(directoryName):
 			fileName = os.path.join(directoryName, fileName)
-			dataFile = open(fileName, 'r')
-			for line in dataFile:
-				if firstLine:
-					firstLine = False
-				else:
-					# read the data
-					#dataList.append(({'text': dataFile, 'type': 'speech'}), random.randint(-1, 1))
-
+			with open(fileName, 'rb') as csvfile:
+				reader = csv.reader(csvfile)
+				for line in reader:
+					if firstLine:
+						firstLine = False
+					else:
+						dataList.append(({
+								'title': line[2],
+								'publication': line[3],
+								'author': line[4],
+								'date': line[5],
+								'site_url': line[8]
+								'text': line[9]
+							}, random.randint(-1, 1)))
 
 
 #trainExamples = util.readExamples('???')
