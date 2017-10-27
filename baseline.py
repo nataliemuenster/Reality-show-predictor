@@ -8,6 +8,7 @@ import numpy as np
 import os
 import csv
 import random
+import string
 
 stopList = []
 for line in open('./english.stop', 'r'):
@@ -23,6 +24,17 @@ def filterStopWords(self, words):
         filtered.append(word)
     return filtered
 
+def get_unigrams(text):
+	text = text.translate(None, string.punctuation).lower()
+	unigrams = collections.defaultdict(lambda:[0, 0])
+	textList = text.split()
+	for word in textList:
+		unigrams[word][0] += 1
+	for word in unigrams:
+		unigrams[word][1] = math.log(unigrams[word][0]) - math.log(len(textList))
+	return unigrams
+
+
 def readFiles(directoryName):
 	print directoryName
 	dataList = []
@@ -32,8 +44,8 @@ def readFiles(directoryName):
 				continue
 			fileName = os.path.join(directoryName, fileName)
 			dataFile = open(fileName, 'r')
-			dataList.append(({'text': dataFile.read().replace('\n', ''), 'type': 'speech'}, random.randint(-1, 1)))
-
+			textFile = dataFile.read().replace('\n', '')
+			dataList.append(({'text': textFile, 'type': 'speech'}, get_unigrams(textFile), random.randint(-1, 1)))
 
 	firstLine = True
 
@@ -51,6 +63,7 @@ def readFiles(directoryName):
 					if firstLine:
 						firstLine = False
 					else:
+						fullText = line[4] + ' ' + line[5].replace('\n', '')
 						dataList.append(({
 								'author': line[2],
 								'published': line[3],
@@ -58,7 +71,7 @@ def readFiles(directoryName):
 								'text': line[5].replace('\n', ''),
 								'site_url': line[8],
 								'type': line[19]
-							}, random.randint(-1, 1)))
+							}, get_unigrams(fullText), random.randint(-1, 1)))
 						
 	firstLine = True
 	if directoryName == '../cs221-data/read-data/':
@@ -73,6 +86,7 @@ def readFiles(directoryName):
 					if firstLine:
 						firstLine = False
 					else:
+						fullText = line[2] + ' ' + line[9].replace('\n', '')
 						dataList.append(({
 								'title': line[2],
 								'publication': line[3],
@@ -80,7 +94,7 @@ def readFiles(directoryName):
 								'date': line[5],
 								'site_url': line[8],
 								'text': line[9].replace('\n', '')
-							}, random.randint(-1, 1)))
+							}, get_unigrams(fullText), random.randint(-1, 1)))
 	return dataList
 
 
@@ -93,6 +107,7 @@ def main(argv):
         print >> sys.stderr, 'Usage: python readDate.py <directory name>'
         sys.exit(1)
     dataList = readFiles(argv[1])
+   # print dataList[0][1]
 
 if __name__ == '__main__':
     main(sys.argv)
