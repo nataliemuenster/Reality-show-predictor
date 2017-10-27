@@ -9,6 +9,7 @@ import os
 import csv
 import random
 import string
+import naive_bayes as nb
 
 stopList = []
 for line in open('./english.stop', 'r'):
@@ -45,7 +46,7 @@ def readFiles(directoryName):
 			fileName = os.path.join(directoryName, fileName)
 			dataFile = open(fileName, 'r')
 			textFile = dataFile.read().replace('\n', '')
-			dataList.append(({'text': textFile, 'type': 'speech'}, get_unigrams(textFile), random.randint(-1, 1)))
+			dataList.append(({'text': textFile, 'type': 'speech'}, random.randint(-1, 1)))
 
 	firstLine = True
 
@@ -71,7 +72,7 @@ def readFiles(directoryName):
 								'text': line[5].replace('\n', ''),
 								'site_url': line[8],
 								'type': line[19]
-							}, get_unigrams(fullText), random.randint(-1, 1)))
+							}, random.randint(-1, 1)))
 						
 	firstLine = True
 	if directoryName == '../cs221-data/read-data/':
@@ -94,7 +95,7 @@ def readFiles(directoryName):
 								'date': line[5],
 								'site_url': line[8],
 								'text': line[9].replace('\n', '')
-							}, get_unigrams(fullText), random.randint(-1, 1)))
+							}, random.randint(-1, 1)))
 	return dataList
 
 
@@ -107,7 +108,24 @@ def main(argv):
         print >> sys.stderr, 'Usage: python readDate.py <directory name>'
         sys.exit(1)
     dataList = readFiles(argv[1])
-   # print dataList[0][1]
+    classifier = nb.NaiveBayes()
+    random.shuffle(dataList)
+    numTrain = 4 * len(dataList) / 5 
+    numCorrect = 0
+    numTotal = 0
+    #print len(dataList)
+    #print numTrain
+    for i in range(len(dataList)):
+    	dataPoint = dataList[i]
+        if i < numTrain:
+        	classifier.train(dataPoint[1], dataPoint[0]['text'])
+        else:
+        	classification = classifier.classify(dataPoint[0]['text'])
+        	numTotal += 1
+        	#print classification
+        	if classification == dataPoint[1]:
+        		numCorrect += 1
+    print "numCorrect: " + str(numCorrect) + ' numTotal: ' + str(numTotal) + ' percentage: ' + str(float(numCorrect) / numTotal)
 
 if __name__ == '__main__':
     main(sys.argv)
