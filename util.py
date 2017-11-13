@@ -10,17 +10,15 @@ import csv
 import string
 
 def createClassDict(classificationsFile):
-	print directoryName
 	classDict = {} #sparseVector
-	with open(fileName, 'r') as file:
+	with open(classificationsFile, 'r') as file:
 		for line in file:
 			pair = line.split(":")
-			classDict[pair[0]] = pair[1]
+			classDict[int(pair[0])] = int(pair[1])
 	return classDict
 
-
-def readFiles(directoryName, classificationDict = None):
-	print directoryName
+#directoryName = "../cs221-data/read-data/"
+def readFiles(directoryName, classificationDict = {}):
 	dataList = []
 
 	firstLine = True
@@ -36,7 +34,7 @@ def readFiles(directoryName, classificationDict = None):
 			reader = csv.reader(csvfile)
 			for line in reader:
 				klass = None
-				if classificationDict != None:
+				if len(classificationDict) > 0:
 					klass = classificationDict[exampleNum] if exampleNum in classificationDict else None
 				else:
 					klass = random.choice([-1, 1])
