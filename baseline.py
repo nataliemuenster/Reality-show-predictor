@@ -7,7 +7,6 @@ import sys
 import numpy as np
 import os
 import csv
-import random
 import string
 import naive_bayes as nb
 
@@ -16,7 +15,7 @@ for line in open('./english.stop', 'r'):
 	stopList.append(line)
 stopList = set(stopList)
 
-
+#aren't using this right now
 def filterStopWords(self, words):
     """Filters stop words."""
     filtered = []
@@ -25,6 +24,7 @@ def filterStopWords(self, words):
         filtered.append(word)
     return filtered
 
+#aren't using this right now
 def get_unigrams(text):
 	text = text.translate(None, string.punctuation).lower()
 	unigrams = collections.defaultdict(lambda:[0, 0])
@@ -35,91 +35,30 @@ def get_unigrams(text):
 		unigrams[word][1] = math.log(unigrams[word][0]) - math.log(len(textList))
 	return unigrams
 
-
-def readFiles(directoryName):
-	print directoryName
-	dataList = []
-	if directoryName == '../cs221-data/congressional-votes-small/':
-		for fileName in os.listdir(directoryName):
-			if fileName == '.DS_Store':
-				continue
-			fileName = os.path.join(directoryName, fileName)
-			dataFile = open(fileName, 'r')
-			textFile = dataFile.read().replace('\n', '')
-			dataList.append(({'text': textFile, 'type': 'speech'}, random.randint(-1, 1)))
-
-	firstLine = True
-
-	if directoryName == '../cs221-data/fake-data/':
-		csv.field_size_limit(sys.maxsize)
-		for fileName in os.listdir(directoryName):
-			if fileName == '.DS_Store':
-				continue
-			print fileName
-			fileName = os.path.join(directoryName, fileName)
-			print fileName
-			with open(fileName, 'rb') as csvfile:
-				reader = csv.reader(csvfile)
-				for line in reader:
-					if firstLine:
-						firstLine = False
-					else:
-						fullText = line[4] + ' ' + line[5].replace('\n', '')
-						dataList.append(({
-								'author': line[2],
-								'published': line[3],
-								'title': line[4],
-								'text': line[5].replace('\n', ''),
-								'site_url': line[8],
-								'type': line[19]
-							}, random.randint(-1, 1)))
-						
-	firstLine = True
-	if directoryName == '../cs221-data/read-data/':
-		csv.field_size_limit(sys.maxsize)
-		for fileName in os.listdir(directoryName):
-			if fileName == '.DS_Store':
-				continue
-			fileName = os.path.join(directoryName, fileName)
-			with open(fileName, 'rb') as csvfile:
-				reader = csv.reader(csvfile)
-				for line in reader:
-					if firstLine:
-						firstLine = False
-					else:
-						fullText = line[2] + ' ' + line[9].replace('\n', '')
-						dataList.append(({
-								'title': line[2],
-								'publication': line[3],
-								'author': line[4],
-								'date': line[5],
-								'site_url': line[8],
-								'text': line[9].replace('\n', '')
-							}, random.randint(-1, 1)))
-	return dataList
-
-
 #trainExamples = util.readExamples('???')
 #valExamples = util.readExamples('???')
 #testExamples = util.readExamples('???')
 
+#run baseline with: python baseline.py <directory name of data> <file name of classifications>
 def main(argv):
     if len(argv) < 2:
         print >> sys.stderr, 'Usage: python readDate.py <directory name>'
         sys.exit(1)
-    dataList = readFiles(argv[1])
+    classificationDict = util.createClassDict(argv[2])
+    dataList = util.readFiles(argv[1], classificationDict)#if no classificationDict passed in, randomized
+    labeledData, unlabeledData = util.separateLabeledExamples(dataList) 
     classifier = nb.NaiveBayes()
-    random.shuffle(dataList)
-    numTrain = 4 * len(dataList) / 5 
+    random.shuffle(labeledData)
+    numTrain = 4 * len(labeledExNums) / 5 #training set = 80% of the data
     numCorrect = 0
     numTotal = 0
-    #print len(dataList)
-    #print numTrain
-    for i in range(len(dataList)):
-    	dataPoint = dataList[i]
-        if i < numTrain:
-        	classifier.train(dataPoint[1], dataPoint[0]['text'])
-        else:
+    
+    for i in xrange(len(labeledData)):
+    	dataPoint = labeledData[i]
+        if i < numTrain: #training set
+        	classifier.train(dataPoint[1], dataPoint[0]['text']) #only uses text of the example
+        else: #dev set
+        #need dev/val and test sets??
         	classification = classifier.classify(dataPoint[0]['text'])
         	numTotal += 1
         	#print classification

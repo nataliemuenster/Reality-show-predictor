@@ -1,0 +1,7 @@
+#entires would look something like this: for example number:classification (-1=left, 1=right)
+'''39:-1
+41:1
+221:1
+229:1
+842:-1
+890:1'''
