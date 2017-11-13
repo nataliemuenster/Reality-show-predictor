@@ -1,2 +1,2 @@
 # News Bias Classifier
-Trains on "fake news" data from Kaggle; ranks new news pieces on scales of different biases.
+Trains on "all-the-news" data from Kaggle; classifies news articles on the political scale of left or right.
