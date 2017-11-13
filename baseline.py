@@ -9,6 +9,7 @@ import os
 import csv
 import string
 import naive_bayes as nb
+import util
 
 stopList = []
 for line in open('./english.stop', 'r'):
@@ -35,29 +36,29 @@ def get_unigrams(text):
 		unigrams[word][1] = math.log(unigrams[word][0]) - math.log(len(textList))
 	return unigrams
 
-#trainExamples = util.readExamples('???')
-#valExamples = util.readExamples('???')
-#testExamples = util.readExamples('???')
-
 #run baseline with: python baseline.py <directory name of data> <file name of classifications>
 def main(argv):
+	#argv[1] = "../cs221-data/read-data/", argv[2] = "./classifications.txt"
     if len(argv) < 2:
-        print >> sys.stderr, 'Usage: python readDate.py <directory name>'
+        print >> sys.stderr, 'Usage: python readDate.py <directory name>' #what is this?
         sys.exit(1)
     classificationDict = util.createClassDict(argv[2])
-    dataList = util.readFiles(argv[1], classificationDict)#if no classificationDict passed in, randomized
+    print "Classifications dict created..."
+    dataList = util.readFiles(argv[1], classificationDict) #if no classificationDict passed in, randomized
+    print "Files read in..."
     labeledData, unlabeledData = util.separateLabeledExamples(dataList) 
     classifier = nb.NaiveBayes()
+    print "Starting training..."
     random.shuffle(labeledData)
-    numTrain = 4 * len(labeledExNums) / 5 #training set = 80% of the data
+    numTrain = 4 * len(labeledData) / 5 #training set = 80% of the data
     numCorrect = 0
     numTotal = 0
-    
+    print "TOTAL_LABELED: " + str(len(labeledData)) + "TOTAL_UNLABELED: " + str(len(unlabeledData)) + "  NUMTRAIN: " + str(numTrain)
     for i in xrange(len(labeledData)):
     	dataPoint = labeledData[i]
         if i < numTrain: #training set
         	classifier.train(dataPoint[1], dataPoint[0]['text']) #only uses text of the example
-        else: #dev set
+        else: #dev set -- only classify once training data all inputted
         #need dev/val and test sets??
         	classification = classifier.classify(dataPoint[0]['text'])
         	numTotal += 1

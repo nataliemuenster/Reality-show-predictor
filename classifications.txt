@@ -1,4 +1,4 @@
-#entires would look something like this: for example number:classification (-1=left, 1=right)
+#replace with real data classifications
 '''39:-1
 41:1
 221:1
