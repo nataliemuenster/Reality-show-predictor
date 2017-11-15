@@ -17,14 +17,6 @@ for line in open('./english.stop', 'r'):
 	stopList.append(line)
 stopList = set(stopList)
 
-#aren't using this right now
-def filterStopWords(self, words):
-    """Filters stop words."""
-    filtered = []
-    for word in words:
-      if not word in self.stopList and word.strip() != '':
-        filtered.append(word)
-    return filtered
 
 #aren't using this right now
 def get_unigrams(text):
@@ -48,7 +40,7 @@ def main(argv):
     labeledData, unlabeledData = util.separateLabeledExamples(dataList) 
     classifier = nb.NaiveBayes()
     random.shuffle(labeledData)
-    numTrain = 1#len(labeledData) / 32 #training set = 80% of the data
+    numTrain = 4*len(labeledData) / 5 #training set = 80% of the data
     numCorrect = 0
     numTotal = 0
     #print "TOTAL_LABELED: " + str(len(labeledData)) + "TOTAL_UNLABELED: " + str(len(unlabeledData)) + "  NUMTRAIN: " + str(numTrain)
@@ -58,7 +50,7 @@ def main(argv):
         	classifier.train(dataPoint[1], dataPoint[0]['text']) #only uses text of the example
         else: #dev set -- only classify once training data all inputted
         #need dev/val and test sets??
-        	classification = classifier.classify(dataPoint[0]['text'])
+        	classification = classifier.nats_classify(dataPoint[0]['text'])
         	numTotal += 1
         	#print classification
         	if classification == dataPoint[1]:

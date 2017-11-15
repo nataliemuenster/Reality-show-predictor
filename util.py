@@ -9,6 +9,8 @@ import os
 import csv
 import string
 
+
+
 def createClassDict(classificationsFile):
 	classDict = {} #sparseVector
 	with open(classificationsFile, 'r') as file:
@@ -53,6 +55,7 @@ def readFiles(directoryName, classificationDict = {}):
 							'text': line[9].replace('\n', '')
 						}, klass))
 					exampleNum += 1
+		csvfile.close()
 	return dataList
 
 
