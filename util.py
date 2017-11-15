@@ -13,8 +13,8 @@ def createClassDict(classificationsFile):
 	classDict = {} #sparseVector
 	with open(classificationsFile, 'r') as file:
 		for line in file:
-			pair = line.split(":")
-			classDict[int(pair[0])] = int(pair[1])
+			klass = line.split(":")
+			classDict[int(klass[0])] = int(klass[1])
 	return classDict
 
 #directoryName = "../cs221-data/read-data/"
@@ -24,7 +24,7 @@ def readFiles(directoryName, classificationDict = {}):
 	firstLine = True
 	#'../cs221-data/read-data/':
 	csv.field_size_limit(sys.maxsize)
-	exampleNum = 1 #account for zero-indexing
+	exampleNum = 0 #examples are zero-indexed
 	labeledExNums = [exNum for exNum in classificationDict] #what happens if None?
 	for fileName in os.listdir(directoryName):
 		if fileName == '.DS_Store':
@@ -34,8 +34,10 @@ def readFiles(directoryName, classificationDict = {}):
 			reader = csv.reader(csvfile)
 			for line in reader:
 				klass = None
-				if len(classificationDict) > 0:
-					klass = classificationDict[exampleNum] if exampleNum in classificationDict else None
+				if len(classificationDict.items()) > 0:
+					if exampleNum in classificationDict:
+						klass = classificationDict[exampleNum]
+					else: klass = None
 				else:
 					klass = random.choice([-1, 1])
 				if firstLine:
@@ -55,7 +57,7 @@ def readFiles(directoryName, classificationDict = {}):
 
 
 def separateLabeledExamples(dataList): #could use classificationDict here instead
-	labeledExamples = [] #no dict/sparse vector needed, right?
+	labeledExamples = [] #no dict/sparse vector needed
 	unlabeledExamples = []
 	for ex in dataList:
 		if ex[1] == None:

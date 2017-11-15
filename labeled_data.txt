@@ -1,0 +1,160 @@
+0:-1:New York Times
+3:-1:New York Times
+4:-1:New York Times
+24:-1:New York Times
+25:-1:New York Times
+29:-1:New York Times
+39:-1:New York Times
+54:-1:New York Times
+2362:-1:New York Times
+2379:-1:New York Times
+7386:-1:New York Times
+7398:-1:New York Times
+7403:-1:New York Times
+7806:1:Breitbart
+7807:1:Breitbart
+7819:1:Breitbart
+7820:1:Breitbart
+7863:1:Breitbart
+7877:1:Breitbart
+7911:1:Breitbart
+7946:1:Breitbart
+7963:1:Breitbart
+7990:1:Breitbart
+7993:1:Breitbart
+8098:1:Breitbart
+8217:1:Breitbart
+33984:-1:CNN
+33985:1:CNN
+34005:-1:CNN
+34010:-1:CNN
+34015:-1:CNN
+34034:1:CNN
+34073:-1:CNN
+34097:1:CNN
+34135:-1:CNN
+34152:1:CNN
+34208:-1:CNN
+34388:-1:CNN
+34393:-1:CNN
+46039:-1:Business Insider
+46053:-1:Business Insider
+46070:-1:Business Insider
+46096:1:Business Insider
+46112:-1:Business Insider
+46153:-1:Business Insider
+46155:-1:Business Insider
+46167:-1:Business Insider
+46231:-1:Business Insider
+46281:-1:Business Insider
+46323:1:Business Insider
+46420:-1:Business Insider
+46506:-1:Business Insider
+53239:-1:Atlantic
+53247:-1:Atlantic
+53250:-1:Atlantic
+53255:-1:Atlantic
+53256:-1:Atlantic
+53265:-1:Atlantic
+53278:-1:Atlantic
+53281:-1:Atlantic
+53282:-1:Atlantic
+53287:-1:Atlantic
+53289:-1:Atlantic
+53290:-1:Atlantic
+53291:-1:Atlantic
+60799:1:Fox News
+60806:1:Fox News
+60829:1:Fox News
+60838:1:Fox News
+60861:1:Fox News
+60919:1:Fox News
+60920:1:Fox News
+60958:1:Fox News
+60984:1:Fox News
+61012:1:Fox News
+61034:1:Fox News
+61046:1:Fox News
+61050:1:Fox News
+61058:1:Fox News
+66140:-1:Talking Points Memo
+64850:-1:Talking Points Memo
+64895:-1:Talking Points Memo
+64911:-1:Talking Points Memo
+64939:-1:Talking Points Memo
+65019:-1:Talking Points Memo
+65038:-1:Talking Points Memo
+66079:-1:Talking Points Memo
+66117:-1:Talking Points Memo
+66160:-1:Talking Points Memo
+66375:-1:Talking Points Memo
+66464:-1:Talking Points Memo
+66477:-1:Talking Points Memo
+70194:-1:Buzzfeed News
+70196:-1:Buzzfeed News
+70210:-1:Buzzfeed News
+70220:-1:Buzzfeed News
+70232:-1:Buzzfeed News
+70270:-1:Buzzfeed News
+70309:-1:Buzzfeed News
+70329:-1:Buzzfeed News
+70371:-1:Buzzfeed News
+70401:-1:Buzzfeed News
+70606:-1:Buzzfeed News
+70664:-1:Buzzfeed News
+72186:-1:Buzzfeed News
+75385:1:National Review
+75392:1:National Review
+75407:1:National Review
+75449:1:National Review
+75461:1:National Review
+75462:1:National Review
+75512:1:National Review
+75566:1:National Review
+75601:1:National Review
+75602:1:National Review
+75626:1:National Review
+75729:1:National Review
+75859:1:National Review
+80588:1:National Review
+82723:1:New York Post
+82758:1:New York Post
+82787:1:New York Post
+82798:1:New York Post
+82825:1:New York Post
+83052:1:New York Post
+83266:1:New York Post
+83251:-1:New York Post
+83268:1:New York Post
+83269:1:New York Post
+83277:1:New York Post
+83498:1:New York Post
+83544:1:New York Post
+93949:1:New York Post
+99652:-1:Guardian
+99661:-1:Guardian
+99693:-1:Guardian
+99776:-1:Guardian
+99897:-1:Guardian
+99919:-1:Guardian
+100003:-1:Guardian
+100020:-1:Guardian
+100210:-1:Guardian
+100224:-1:Guardian
+100460:-1:Guardian
+100674:-1:Guardian
+103457:-1:Guardian
+107333:-1:NPR
+107334:-1:NPR
+107415:-1:NPR
+107421:-1:NPR
+107498:-1:NPR
+107500:-1:NPR
+107631:-1:NPR
+107684:-1:NPR
+107833:-1:NPR
+107874:-1:NPR
+107900:-1:NPR
+108085:-1:NPR
+108749:-1:NPR
+113077:-1:NPR
