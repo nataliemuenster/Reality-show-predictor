@@ -29,16 +29,17 @@ def main(argv):
     numCorrect = 0
     numTotal = 0
     secondNB = nb.NaiveBayes()
-    random.shuffle(unlabeledData)
+    
     for i in range(len(labeledData)):
         dataPoint = labeledData[i]
         if i < numTrain: #training set
             secondNB.train(dataPoint[1], dataPoint[0]['text'])
         else:
             break
+    random.shuffle(unlabeledData)
     unlabeledLiberal = 0
     unlabeledConservative = 0
-    for i in range(len(unlabeledData)):
+    for i in range(len(unlabeledData)/100): #only use 1% of the full unlabeled dataset
         dataPoint = unlabeledData[i]
         classification = secondNB.classify(dataPoint[0]['text'])
         secondNB.train(classification, dataPoint[0]['text'])
