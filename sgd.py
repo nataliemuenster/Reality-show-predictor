@@ -21,7 +21,7 @@ class SGD:
         f = open(fileName) 
         for line in f: #need to remove endline char from each line??
             keyword, regexes = line.split(', ')
-            features.append((keyword, regexes))
+            features.append((keyword, regexes[:-1])) #get rid of newline char
         f.close()
         return features #('\n'.join(contents)).split()
 
@@ -37,10 +37,10 @@ class SGD:
         Example: "I am what I am" --> {'I': 2, 'am': 2, 'what': 1}
         """
         featureDict = collections.defaultdict(float)
-        for sentence in example['text'].split('.'):
-            ss = self.sid.polarity_scores(example['text'])
-            featureDict["pos_sentiment"] += ss['pos']
-            featureDict["neg_sentiment"] += ss['neg']
+        # for sentence in example['text'].split('.'):
+        #     ss = self.sid.polarity_scores(example['text'])
+        #     featureDict["pos_sentiment"] += ss['pos']
+        #     featureDict["neg_sentiment"] += ss['neg']
         #add parts of speech?   pos_tag(example)
         
         featureDict["title_sentiment"] = self.sid.polarity_scores(example['title'])['compound']
@@ -101,8 +101,7 @@ class SGD:
         t0 = time.time()
         weights = {}
         for i in range(self.numIters):
-            print "lol"
-            print len(trainExamples)
+            print "iteration " + str(i)
             for example in trainExamples:
                 #phi(x)
                 featureVector = self.featureExtractor(example[0])

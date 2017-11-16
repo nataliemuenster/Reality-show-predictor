@@ -58,7 +58,7 @@ def main(argv):
                 if classification == dataPoint[1]:
                     numCorrect += 1
     elif argv[3] == "sgd":
-        classifier = sgd.SGD(2) #CURRENTLY NUMITER = 2 INSTEAD OF 20(?)
+        classifier = sgd.SGD(20) #CURRENTLY NUMITER = 2 INSTEAD OF 20(?)
         trainSet = labeledData[:numTrain] #training set
         devSet = labeledData[numTrain:] #need dev and test set??
         weights = classifier.perform_sgd(trainSet) #uses text and title of the example
