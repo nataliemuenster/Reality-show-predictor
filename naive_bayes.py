@@ -17,8 +17,6 @@ class NaiveBayes:
     # total number of docs
     self.nDocs = 0.0
     self.vocab = set() #build vocabulary of unique words for pos and neg classes
-    self.leftWords = [] #HARDCODE THESE
-    self.rightWords = []
     self.stopWords = self.readStopWordsFile('./english.stop')
 
   def readStopWordsFile(self, fileName):
@@ -38,20 +36,12 @@ class NaiveBayes:
     return filtered
 
 
-  def nats_classify(self, text):
+  def classify(self, text):
     words = text.translate(None, string.punctuation).lower().split()
     words = self.filterStopWords(words)
     uniqueWords = set()
     for word in words:
       uniqueWords.add(word)
-
-    polarizingWords = set() #will this work??
-    for word in uniqueWords:
-        diff = math.fabs(self.wordCountsForClass[1][word][1] - self.wordCountsForClass[-1][word][1])
-        #print diff, word, self.wordCountsForPosClass[word][bflag], self.wordCountsForNegClass[word][bflag]
-        if diff > 55: #optimize this...? This number taken from 124
-          polarizingWords.add(word)
-    #print polarizingWords
     
     klass = -1
     leftCalc = math.log(self.docCount[-1] + 1)
@@ -59,19 +49,13 @@ class NaiveBayes:
     rightCalc = math.log(self.docCount[1] + 1)
     rightCalc -= math.log(self.docCount[1] + self.docCount[-1])
 
-    leftDenom = self.wordCounts[-1][1] + len(self.vocab) #3rd index 1 or 0??
-    rightDenom = self.wordCounts[1][1] + len(self.vocab)
+    leftDenom = self.wordCounts[-1][0] + len(self.vocab) #3rd index 1 or 0??
+    rightDenom = self.wordCounts[1][0] + len(self.vocab)
 
     for word in uniqueWords:
-        multiplier = 1
-        if (word in self.leftWords or word in self.rightWords):
-          multiplier = 5
-        #if (word in polarizingWords):
-        #  multiplier = 4
-
-        rightCalc += math.log((self.wordCountsForClass[1][word][0] + 1)**multiplier)
+        rightCalc += math.log(self.wordCountsForClass[1][word][0] + 1)
         rightCalc -= math.log(rightDenom)
-        leftCalc += math.log((self.wordCountsForClass[-1][word][0] + 1)**multiplier)
+        leftCalc += math.log(self.wordCountsForClass[-1][word][0] + 1)
         leftCalc -= math.log(leftDenom)
 
     if rightCalc > leftCalc:
@@ -79,25 +63,6 @@ class NaiveBayes:
 
     return klass
 
-  def classify(self, text):
-    words = text.translate(None, string.punctuation).lower().split()
-    klass = None
-    maxProb = float("-inf")
-    for c in self.classCounts:
-      prior = math.log(self.classCounts[c][0]) - math.log(self.nDocs) #log of prior probability 
-      prob = prior
-      for word in words:
-        if word in self.wordCounts: # skip over unseen words
-          wordCount = self.wordCounts[word][c][1]
-          #if wordCount == 0: wordCount = 1
-          #print self.classCounts[c][1] + len(self.wordCounts)
-          likelihood = math.log(wordCount + 1) - math.log(self.classCounts[c][1] + len(self.wordCounts)) 
-          prob += likelihood
-      if prob > maxProb: 
-        maxProb = prob
-        klass = c
-    #returns None if there's an issue
-    return klass
 
   #takes in text in doc and the doc's class
   def train(self, klass, text):

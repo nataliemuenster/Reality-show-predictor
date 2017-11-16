@@ -1,12 +1,17 @@
 import collections
 import math
 import string
+from nltk import pos_tag
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 class SGD:
 	def __init__(self, numIters = 20, eta=.01):
 		self.featureExtractor = self.extractWordFeatures
 		self.numIters = numIters
 		self.eta = eta
+        self.leftWords = [] #hard-code these in
+        self.rightWords = []
+
 
 	def extractWordFeatures(self, example):
     """
@@ -16,7 +21,7 @@ class SGD:
     @return dict: feature vector representation of x.
     Example: "I am what I am" --> {'I': 2, 'am': 2, 'what': 1}
     """
-    listOfWords = {'????????'}
+    listOfWords = ['????????']
     featureDict = {}
     for word in example['text']:
     	# Political words, sentiment, etc, NOT every word. This helps us remove topical bias

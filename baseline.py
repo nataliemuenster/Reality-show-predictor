@@ -52,49 +52,12 @@ def main(argv):
         	classifier.train(dataPoint[1], dataPoint[0]['text']) #only uses text of the example
         else: #dev set -- only classify once training data all inputted
         #need dev/val and test sets??
-        	classification = classifier.nats_classify(dataPoint[0]['text'])
+        	classification = classifier.classify(dataPoint[0]['text'])
         	numTotal += 1
         	#print classification
         	if classification == dataPoint[1]:
         		numCorrect += 1
     print "numCorrect: " + str(numCorrect) + ' numTotal: ' + str(numTotal) + ' percentage: ' + str(float(numCorrect) / numTotal)
-    print "semi-supervised"
-    newLabeledData = list(labeledData)
-    random.shuffle(newLabeledData)
-    numTrain = 4*len(labeledData) / 5 #training set = 80% of the data
-    numCorrect = 0
-    numTotal = 0
-    secondNB = nb.NaiveBayes()
-    random.shuffle(unlabeledData)
-    for i in range(len(newLabeledData)):
-        dataPoint = newLabeledData[i]
-        if i < numTrain: #training set
-            secondNB.train(dataPoint[1], dataPoint[0]['text'])
-        else:
-            break
-    unlabeledLiberal = 0
-    unlabeledConservative = 0
-    for i in range(len(unlabeledData)):
-        dataPoint = unlabeledData[i]
-        classification = secondNB.nats_classify(dataPoint[0]['text'])
-        secondNB.train(classification, dataPoint[0]['text'])
-        #print i
-        #print classification
-        if classification == -1:
-            unlabeledLiberal += 1
-        else:
-            unlabeledConservative += 1
-
-
-    for i in range(numTrain, len(newLabeledData)):
-        dataPoint = newLabeledData[i]
-        classification = secondNB.nats_classify(dataPoint[0]['text'])
-        numTotal += 1
-        #print classification
-        if classification == dataPoint[1]:
-            numCorrect += 1
-    print "numCorrect: " + str(numCorrect) + ' numTotal: ' + str(numTotal) + ' percentage: ' + str(float(numCorrect) / numTotal)
-
 
 
 
