@@ -32,20 +32,21 @@ def main(argv):
     trainSet = labeledData[:numTrain] #training set
     devSet = labeledData[numTrain:] #need dev and test set??
     weights = classifier.perform_sgd(trainSet)
-
+    print "me"
     subsequentTrainSet = list(trainSet)
     random.shuffle(unlabeledData)
     unlabeledLiberal = 0
     unlabeledConservative = 0
-    everyTenFlag = (len(unlabeledData) / 100) % 10
-    for i in range(len(unlabeledData) / 100): # Use 1% of data for now
-        classification = classifier.classify(unlabeledData[i][0])
+    everyTenFlag = (len(unlabeledData) / 1000) % 50
+    for i in range(len(unlabeledData) / 1000): # Use 1% of data for now
+        print i
+        classification = classifier.classify(unlabeledData[i][0], weights)
         if classification == -1:
             unlabeledLiberal += 1
         else:
             unlabeledConservative += 1
         subsequentTrainSet.append((unlabeledData[i][0], classification))
-        if i + 1 % 10 == 0:
+        if (i + 1) % 50 == 0:
             weights = classifier.perform_sgd(subsequentTrainSet)
     if not everyTenFlag == 0:
         weights = classifier.perform_sgd(subsequentTrainSet)
@@ -54,6 +55,7 @@ def main(argv):
     for ex in devSet:
         classification = classifier.classify(ex[0], weights)
         numTotal += 1
+        print classification
         if classification == ex[1]:
             numCorrect += 1
 

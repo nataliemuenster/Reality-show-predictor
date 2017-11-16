@@ -101,6 +101,8 @@ class SGD:
         t0 = time.time()
         weights = {}
         for i in range(self.numIters):
+            print "lol"
+            print len(trainExamples)
             for example in trainExamples:
                 #phi(x)
                 featureVector = self.featureExtractor(example[0])

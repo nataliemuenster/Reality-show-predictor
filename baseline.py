@@ -1,6 +1,3 @@
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.feature_extraction.text import CountVectorizer
 import random
 import collections
 import math
@@ -69,6 +66,7 @@ def main(argv):
         for ex in devSet:
             classification = classifier.classify(ex[0], weights)
             numTotal += 1
+            print classification
             if classification == ex[1]:
                 numCorrect += 1
 
