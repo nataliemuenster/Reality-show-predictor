@@ -14,9 +14,8 @@ import time
 #semisupervised_nb.py
 def main(argv):
 	#argv[1] = "../cs221-data/read-data/", argv[2] = "./labeled_data.txt"
-    t0 = time.time()
-    if len(argv) < 2:
-        print >> sys.stderr, 'Usage: python readDate.py <directory name>' #what is this?
+    if len(argv) < 3:
+        print >> sys.stderr, 'Usage: python semisupervised_nb.py <data directory name> <labels file name>' #what is this?
         sys.exit(1)
     classificationDict = util.createClassDict(argv[2])
     dataList = util.readFiles(argv[1], classificationDict) #if no classificationDict passed in, randomized
@@ -59,8 +58,6 @@ def main(argv):
         if classification == dataPoint[1]:
             numCorrect += 1
     print "numCorrect: " + str(numCorrect) + ' numTotal: ' + str(numTotal) + ' percentage: ' + str(float(numCorrect) / numTotal)
-    t1 = time.time()
-    print "TIME: " + str(t0-t1)
 
 
 

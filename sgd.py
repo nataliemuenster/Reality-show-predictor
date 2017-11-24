@@ -11,8 +11,6 @@ class SGD:
         self.featureExtractor = self.extractWordFeatures
         self.numIters = numIters
         self.eta = eta
-        self.leftWords = [] #hard-code these in
-        self.rightWords = []
         self.sid = SentimentIntensityAnalyzer()
         self.features = self.readFeatureFile('./featureList.txt')
 
@@ -44,7 +42,7 @@ class SGD:
         #add parts of speech?   pos_tag(example)
         
         featureDict["title_sentiment"] = self.sid.polarity_scores(example['title'])['compound']
-        featureDict["total_sentiment"] = self.sid.polarity_scores(example['text'])['compound']
+        #featureDict["total_sentiment"] = self.sid.polarity_scores(example['text'])['compound'] #takes too long, may not be important
 
         exampleText = example["text"].translate(None, string.punctuation).lower()
         exampleTitle = example["title"].translate(None, string.punctuation).lower()
@@ -55,6 +53,18 @@ class SGD:
                 featureDict[feature[0]] += countText
             if countTitle > 0:
                 featureDict[feature[0]] += countTitle * 2 #optimize weighting here
+
+        #SUPER SLOW with this... --> aded pronouns to featureList instead
+        #get dif of stop words before this -- will it speed up???
+        '''tags = pos_tag(example["text"])
+        numAdj = 0
+        numPron = 0
+        for tag in tags: #(each in the form of [word, tag])
+            if tag[1] == "PRON": numPron += 1
+            elif tag[1] == "ADJ": numAdj += 1
+        featureDict["pronouns"] = numPron
+        featureDict["adjectives"] = numAdj
+        '''
 
         # for word in example['text']:
         # 	# Political words, sentiment, etc, NOT every word. This helps us remove topical bias

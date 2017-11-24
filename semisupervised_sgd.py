@@ -16,8 +16,8 @@ import time
 def main(argv):
 	#argv[1] = "../cs221-data/read-data/", argv[2] = "./labeled_data.txt"
     t0 = time.time()
-    if len(argv) < 2:
-        print >> sys.stderr, 'Usage: python readDate.py <directory name>' #what is this?
+    if len(argv) < 3:
+        print >> sys.stderr, 'Usage: python semisupervised_sgd.py <data directory name> <labels file name>' #what is this?
         sys.exit(1)
     classificationDict = util.createClassDict(argv[2])
     dataList = util.readFiles(argv[1], classificationDict) #if no classificationDict passed in, randomized
@@ -30,7 +30,7 @@ def main(argv):
     numCorrect = 0
     numTotal = 0
     trainSet = labeledData[:numTrain] #training set
-    devSet = labeledData[numTrain:] #need dev and test set??
+    testSet = labeledData[numTrain:] #need dev and test set??
     weights = classifier.perform_sgd(trainSet)
     print "me"
     subsequentTrainSet = list(trainSet)
@@ -52,7 +52,7 @@ def main(argv):
         weights = classifier.perform_sgd(subsequentTrainSet)
 
 
-    for ex in devSet:
+    for ex in testSet:
         classification = classifier.classify(ex[0], weights)
         numTotal += 1
         print classification
