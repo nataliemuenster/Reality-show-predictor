@@ -12,7 +12,7 @@ import util
 import time 
 
 class Kmeans:
-    def __init__(self, maxIters = 10, k=2):
+    def __init__(self, k = 2, maxIters = 10):
         '''K: number of desired clusters. Assume that 0 < K <= |examples|.
         maxIters: maximum number of iterations to run, terminates early upon convergence.
         '''
@@ -51,13 +51,13 @@ class Kmeans:
             sq += val**2
         self.examplesSQD.append(sq)
 
-    def findClosestCluster(self, examplesSQD, centroidsSQD, centroids, examples, ex):
+    def findClosestCluster(self, centroidsSQD, centroids, ex):
         distances = []
         for c in xrange(len(centroids)):
             dist = 0.0; 
-            dist += examplesSQD[ex]
+            dist += self.examplesSQD[ex]
             dist += centroidsSQD[c]
-            distances.append(dist - (2 * dotProduct(examples[ex], centroids[c])))
+            distances.append(dist - (2 * util.dotProduct(self.examples[ex], centroids[c])))
 
         return distances.index(min(distances))
 
@@ -72,12 +72,17 @@ class Kmeans:
         centroids = []
         #generate initial centroid locations
         for k in xrange(self.K):
-            randEx = random.randint(0, len(self.examples))
+            randEx = random.randint(0, len(self.examples)-1)
+            #print "RandEx:" + str(randEx)
             randCentroid = self.examples[randEx]
+            
             while randCentroid in centroids: #sample without replacement
-                randEx = np.random.randint(0, len(examples))
+                randEx = np.random.randint(0, len(self.examples)-1)
                 randCentroid = self.examples[randEx]
+                #print "hi -- duplicate randint, now = " + str(randEx)
+            #print "rand centroid" + str(randCentroid)
             centroids.append(randCentroid)
+        #print "done"
         
         #precompute example^2
         '''examplesSQD = []
@@ -88,7 +93,8 @@ class Kmeans:
             examplesSQD.append(sq)'''
             
         for iters in xrange(self.maxIters):
-            print "iteration " + str(iters)
+            #print "iteration " + str(iters)
+            #print "CLUSTERSSSSS: " + str(centroids)
             #precompute centroid^2
             centroidsSQD = []
             for c in xrange(len(centroids)):
@@ -97,34 +103,37 @@ class Kmeans:
                     csq += val**2
                 centroidsSQD.append(csq)
 
-            clusterAssignments = [0] * len(examples) #each example mapped to cluster it belongs to
+            clusterAssignments = [0] * len(self.examples) #each example mapped to cluster it belongs to
+            
             for pt in xrange(len(self.examples)):
-                closest = findClosestCluster(examplesSQD, centroidsSQD, centroids, self.examples, pt)
-                clusterAssignments[pt] = closest 
-            print "examples assigned, now recalculating clusters"
+                closest = self.findClosestCluster(centroidsSQD, centroids, pt)
+                clusterAssignments[pt] = closest
+            #print "examples assigned, now recalculating clusters. (assignments): " + str(clusterAssignments)
             #Compute the new centroids as the average of all features assigned to it
             clusterSize = [0] * self.K
-            clusterContents = [{} for h in xrange(K)]
+            clusterContents = [{} for h in xrange(self.K)]
+            #print "EMPTY CLUSTERS?" + str(clusterContents)
             for j in xrange(len(self.examples)):
-                increment(clusterContents[clusterAssignments[j]], 1, self.examples[j])
+                util.increment(clusterContents[clusterAssignments[j]], 1, self.examples[j])
                 clusterSize[clusterAssignments[j]] += 1
-
+            #print "CLUSTER CONTENTS: " + str(clusterContents)
             newCentroids = []
             for i in xrange(len(centroids)):
                 newC = {}
 
-                increment(newC, 1.0/clusterSize[i], clusterContents[i])
+                util.increment(newC, 1.0/clusterSize[i], clusterContents[i])
                 newCentroids.append(newC)
             
             if newCentroids == centroids:
+                #print "converged"
                 break
             centroids = newCentroids
 
         reconstrLoss = 0.0
         '''for x in xrange(len(self.examples)):
-            reconstrLoss += examplesSQD[x]
+            reconstrLoss += self.examplesSQD[x]
             reconstrLoss += centroidsSQD[clusterAssignments[x]]
-            reconstrLoss -= 2 * dotProduct(self.examples[x], centroids[clusterAssignments[x]])'''
+            reconstrLoss -= 2 * util.dotProduct(self.examples[x], centroids[clusterAssignments[x]])'''
         
         return centroids, clusterAssignments, reconstrLoss
 
