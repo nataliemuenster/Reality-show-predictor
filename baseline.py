@@ -11,6 +11,7 @@ import naive_bayes_optimized as nb_opt
 import sgd as sgd
 import semisupervised as ss
 import util
+from sklearn.metrics import precision_recall_fscore_support
 
 stopList = []
 for line in open('./english.stop', 'r'):
@@ -43,21 +44,26 @@ def main(argv):
     numTrain = 4*len(labeledData) / 5 #training set = 80% of the data
     numCorrect = 0
     numTotal = 0
-    #print "TOTAL_LABELED: " + str(len(labeledData)) + "TOTAL_UNLABELED: " + str(len(unlabeledData)) + "  NUMTRAIN: " + str(numTrain)
-    
+    testResults = ([],[]) #Y, prediction
+
     if argv[3] == "nb":
         classifier = nb_opt.NaiveBayes()
         for i in xrange(len(labeledData)):
             dataPoint = labeledData[i]
             if i < numTrain: #training set
-                classifier.train(dataPoint[1], dataPoint[0]['text']) #only uses text of the example
+                classifier.train(dataPoint[2], dataPoint[1]['text']) #only uses text of the example
             else: #dev set -- only classify once training data all inputted
             #need dev/val and test sets??
-                classification = classifier.classify(dataPoint[0]['text'])
+                classification = classifier.classify(dataPoint[1]['text'])
                 numTotal += 1
                 #print classification
-                if classification == dataPoint[1]:
+                if classification == dataPoint[2]:
                     numCorrect += 1
+                testResults[0].append(dataPoint[2])
+                testResults[1].append(classification)
+        precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
+        print "Baseline NB TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+
     elif argv[3] == "sgd":
         classifier = sgd.SGD(20) #(numIterations, eta)
         trainSet = labeledData[:numTrain] #training set
@@ -65,11 +71,15 @@ def main(argv):
         weights = classifier.perform_sgd(trainSet) #uses text and title of the example
         #dev set -- only classify once training data all inputted
         for ex in testSet:
-            classification = classifier.classify(ex[0], weights)
+            classification = classifier.classify(ex[1], weights)
             numTotal += 1
             print classification
-            if classification == ex[1]:
+            if classification == ex[2]:
                 numCorrect += 1
+            testResults[0].append(ex[2])
+            testResults[1].append(classification)
+        precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
+        print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
 
     else:
         print >> sys.stderr, 'Usage: python readDate.py <directory name> <labels file name> <algorithm> ("nb" or "sgd")'

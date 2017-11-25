@@ -9,6 +9,7 @@ import string
 import util
 import time 
 import kmeans
+from sklearn.metrics import precision_recall_fscore_support
 
 #python unsupervised.py ../cs221-data/read-data/ ./labeled_data.txt 
 def main(argv):
@@ -18,8 +19,6 @@ def main(argv):
     classificationDict = util.createClassDict(argv[2])
     dataList = util.readFiles(argv[1], classificationDict) #if no classificationDict passed in, randomized
     labeledData, unlabeledData = util.separateLabeledExamples(dataList) 
-    print labeledData[0]
-    return
     
     random.shuffle(labeledData)
     numDev = len(labeledData) / 2 #training set = 50% of the labeled data
@@ -31,34 +30,45 @@ def main(argv):
     devSet = labeledData[:numDev]
     testSet = labeledData[numDev:]
     
-    classifier.createExampleVector({"text": "Hello my friend shipwreck"})
-    classifier.createExampleVector({"text": "Where did my planet go moon?"})
-    classifier.createExampleVector({"text": "Moo"})
-    #for ex in dataList:
-    #    classifier.createExampleVector(ex[0])
-    print "All examples processed."
-    centroids, clusterAssignments, reconstrLoss = classifier.runKmeans()
-    print "CENTROID1: len and contents" + str(len(centroids[0])) + str(centroids[0])
-    print "CENTROID2: len and contents" + str(len(centroids[1])) + str(centroids[1])
+    #classifier.createExampleVector((0,{"text": "Hello my friend shipwreck"},None))
+    #classifier.createExampleVector((1,{"text": "Where did my planet go moon?"},None))
+    #classifier.createExampleVector((2,{"text": "Moo"},None))
+    for ex in dataList:
+        classifier.createExampleVector(ex)
     
-    for ex in devSet: #determine which cluster corresponds with which classification by randomly assigning and choosing the best
-        #print ex
-        classification = -1 if clusterAssignments[ex[0]] == centroids[0] else 1 #NEED NUMBER OF EX, NOT EX ITSELF!!
-        #print classification
-        if classification == ex[1]:
-            numDevCorrect += 1
-    print "DEV SET NUM CORRECT: " + str(numDevCorrect)
-    centroidAssignment = (0,1) if numDevCorrect > numDev / 2 else (1,0) #determine whether to switch assignments
+    centroids, clusterAssignments, reconstrLoss = classifier.runKmeans()
 
+    devResults = ([],[]) #Y, prediction
+    testResults = ([],[]) #Y, prediction
+
+    print "centroids start at (0,1)"
+    for ex in devSet: #determine which cluster corresponds with which classification by randomly assigning and choosing the best
+        classification = -1 if clusterAssignments[ex[0]] == centroids[0] else 1
+        #print classification
+        if classification == ex[2]:
+            numDevCorrect += 1
+        devResults[0].append(ex[2])
+        devResults[1].append(classification)
+    print "DEV SET NUM CORRECT: " + str(float(numDevCorrect) / numDev)
+    if numDevCorrect > (numDev / 2) else (1,0) #determine whether to switch assignments
+    	centroidAssignment = (0,1) 
+    	devResults[1] = [1-i for i in devResults]
+
+    precision,recall,fscore,support = precision_recall_fscore_support(devResults[0], devResults[1], average='binary')
+	print "Kmeans DEV scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+    print "centroids assigned: " + str(centroidAssignment)
     #evaluate
     for ex in testSet:
-        classification = -1 if assignments[ex[0]] == centroidAssignment[0] else 1
+        classification = -1 if clusterAssignments[ex[0]] == centroidAssignment[0] else 1
         print classification
-        if classification == ex[1]:
+        if classification == ex[2]:
             numTestCorrect += 1
+        testResults[0].append(ex[2])
+        testResults[1].append(classification)
 
     print "numCorrect: " + str(numTestCorrect) + ' numTotal: ' + str(numTest) + ' percentage: ' + str(float(numTestCorrect) / numTest)
-    
+    precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
+    print "Kmeans TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
 
 
 if __name__ == '__main__':

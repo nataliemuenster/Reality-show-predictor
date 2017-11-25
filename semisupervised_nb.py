@@ -10,6 +10,7 @@ import naive_bayes as nb
 import semisupervised as ss
 import util
 import time 
+from sklearn.metrics import precision_recall_fscore_support
 
 #semisupervised_nb.py
 def main(argv):
@@ -27,12 +28,13 @@ def main(argv):
     numTrain = 4*len(labeledData) / 5 #training set = 80% of the data
     numCorrect = 0
     numTotal = 0
+    testResults = ([],[]) #Y, prediction
     secondNB = nb.NaiveBayes()
     
     for i in range(len(labeledData)):
         dataPoint = labeledData[i]
         if i < numTrain: #training set
-            secondNB.train(dataPoint[1], dataPoint[0]['text'])
+            secondNB.train(dataPoint[2], dataPoint[1]['text'])
         else:
             break
     random.shuffle(unlabeledData)
@@ -40,8 +42,8 @@ def main(argv):
     unlabeledConservative = 0
     for i in range(len(unlabeledData)/100): #only use 1% of the full unlabeled dataset
         dataPoint = unlabeledData[i]
-        classification = secondNB.classify(dataPoint[0]['text'])
-        secondNB.train(classification, dataPoint[0]['text'])
+        classification = secondNB.classify(dataPoint[1]['text'])
+        secondNB.train(classification, dataPoint[1]['text'])
         #print i
         #print classification
         if classification == -1:
@@ -52,11 +54,16 @@ def main(argv):
 
     for i in range(numTrain, len(labeledData)):
         dataPoint = labeledData[i]
-        classification = secondNB.classify(dataPoint[0]['text'])
+        classification = secondNB.classify(dataPoint[1]['text'])
         numTotal += 1
         #print classification
-        if classification == dataPoint[1]:
+        if classification == dataPoint[2]:
             numCorrect += 1
+        testResults[0].append(dataPoint[2])
+        testResults[1].append(classification)
+
+    precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
+    print "semisupervised NB TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
     print "numCorrect: " + str(numCorrect) + ' numTotal: ' + str(numTotal) + ' percentage: ' + str(float(numCorrect) / numTotal)
 
 

@@ -40,8 +40,11 @@ class SGD:
         #     featureDict["pos_sentiment"] += ss['pos']
         #     featureDict["neg_sentiment"] += ss['neg']
         #add parts of speech?   pos_tag(example)
-        
-        featureDict["title_sentiment"] = self.sid.polarity_scores(example['title'])['compound']
+        deb1 = example['title']
+        deb2 = self.sid.polarity_scores(deb1)
+        deb3 = deb2['compound']
+        featureDict['title_sentiment'] = deb3
+        #featureDict["title_sentiment"] = self.sid.polarity_scores(example['title'])['compound']
         #featureDict["total_sentiment"] = self.sid.polarity_scores(example['text'])['compound'] #takes too long, may not be important
 
         exampleText = example["text"].translate(None, string.punctuation).lower()
@@ -108,15 +111,16 @@ class SGD:
 
 
     def perform_sgd(self, trainExamples):
-        t0 = time.time()
         weights = {}
+        #print trainExamples[0]
         for i in range(self.numIters):
             print "iteration " + str(i)
             for example in trainExamples:
                 #phi(x)
-                featureVector = self.featureExtractor(example[0])
+                #print "Ex feature vectorized is: " + str(example[1])
+                featureVector = self.featureExtractor(example[1])
                 #y
-                yValue = example[1]
+                yValue = example[2]
                 #calculates phi(x)y
                 for key in featureVector:
                     featureVector[key] *= yValue
@@ -126,8 +130,6 @@ class SGD:
                 if self.dotProduct(weights, featureVector) < 1:
                     gradientLoss = featureVector
                 self.increment(weights, self.eta, gradientLoss)
-        t1 = time.time()
-        print "TIME: " + str(t0-t1)
         return weights
 
     def classify(self, example, weights):

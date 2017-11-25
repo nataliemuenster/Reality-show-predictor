@@ -39,7 +39,7 @@ class Kmeans:
         return filtered
 
     def createExampleVector(self, example):
-        words = example["text"].translate(None, string.punctuation).lower().split()
+        words = example[1]["text"].translate(None, string.punctuation).lower().split()
         words = self.filterStopWords(words)
         wordCounts = collections.defaultdict(int) #unigram model to represent each article
         for word in words:
@@ -125,7 +125,7 @@ class Kmeans:
                 newCentroids.append(newC)
             
             if newCentroids == centroids:
-                #print "converged"
+                print "converged after iteration " + str(iters)
                 break
             centroids = newCentroids
 

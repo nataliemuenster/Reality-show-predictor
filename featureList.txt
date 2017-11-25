@@ -20,4 +20,4 @@ INTELLECTUALISM, (university|phd|mba|dissertation|scholar|dr|elite|elitism|ivy|s
 MENTIONEDSOURCES, (new york times|economist|wall street journal)
 OPINIONWORDS, (obviously|clearly|without a doubt|no doubt|obvious|consequently)
 PRONOUNS, ( he | his | she | her | you |your| i | me |they| we | us )
-Win, ( win | won | lose | lost )
+COMPETITIVE, ( win | won | lose | lost | worst | best )

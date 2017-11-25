@@ -46,7 +46,7 @@ def readFiles(directoryName, classificationDict = {}):
 					firstLine = False
 				else:
 					fullText = line[2] + ' ' + line[9].replace('\n', '')
-					dataList.append(({
+					dataList.append((exampleNum, {
 							'title': line[2],
 							'publication': line[3],
 							'author': line[4],
@@ -63,7 +63,7 @@ def separateLabeledExamples(dataList): #could use classificationDict here instea
 	labeledExamples = [] #no dict/sparse vector needed
 	unlabeledExamples = []
 	for ex in dataList:
-		if ex[1] == None:
+		if ex[2] == None:
 			unlabeledExamples.append(ex)
 		else:
 			labeledExamples.append(ex) #example, klass
@@ -90,4 +90,4 @@ def dotProduct(d1, d2):
         return dotProduct(d2, d1)
     else:
         return sum(d1.get(f, 0) * v for f, v in d2.items())
-        
+
