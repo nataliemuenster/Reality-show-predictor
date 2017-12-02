@@ -30,10 +30,7 @@ def main(argv):
     devSet = labeledData[:numDev]
     testSet = labeledData[numDev:]
     
-    #classifier.createExampleVector((0,{"text": "Hello my friend shipwreck"},None))
-    #classifier.createExampleVector((1,{"text": "Where did my planet go moon?"},None))
-    #classifier.createExampleVector((2,{"text": "Moo"},None))
-    for ex in dataList:
+    for ex in dataList: #run the model on all the data, then later check the values for labeled examples
         classifier.createExampleVector(ex)
     
     centroids, clusterAssignments, reconstrLoss = classifier.runKmeans()
