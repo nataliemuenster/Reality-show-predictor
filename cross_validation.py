@@ -43,8 +43,9 @@ def getFolds(dataList, nFolds=5):
             endIndex = startIndex + numPerFold
             folds.append(dataList[startIndex:endIndex])
     return folds
-#run baseline with: python baseline.py <directory name of data> <file name of classifications>
-#python baseline.py ../cs221-data/read-data/ ./labeled_data.txt nb/sgd 
+
+#run cross_validation with: python cross_validation.py <directory name of data> <file name of classifications>
+#python cross_validation.py ../cs221-data/read-data/ ./labeled_data.txt nb/sgd 
 def main(argv):
     if len(argv) < 4:
         print >> sys.stderr, 'Usage: python baseline.py <data directory name> <labels file name> <algorithm>'
@@ -71,18 +72,8 @@ def main(argv):
         return trainFolds
 
     #list of percentage correct in each run
-    results = collections.defaultdict(lambda: [])
+    results = []
     if argv[3] == "majority":
-        #classify every example the same
-        # trainSet = labeledData[:numTrain]
-        # testSet = labeledData[numTrain:]
-        # numLeft = 0
-        # numRight = 0
-        # for ex in trainSet:
-        #     if ex[2] == -1:
-        #         numLeft += 1
-        #     else: numRight += 1
-
         #crossValidation:
         for i, fold in enumerate(folds):
             trainSet = getTrainFolds(i)
@@ -120,29 +111,6 @@ def main(argv):
             print "Baseline NB TEST scores for fold %d:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (i, precision, recall, fscore)
             results.append(numCorrect)
 
-        #old code just in case
-        #averages = [0, 0, 0]
-        # for result in results:
-        #     for _ in range(len(averages)):
-        #         averages[_] += result[_]/float(len(folds))
-        # #returns tuple of precision, recall, fscore, support
-        # averageResult = tuple(averages)
-        # for i in xrange(len(labeledData)):
-        #     dataPoint = labeledData[i]
-        #     if i < numTrain: #training set
-        #         classifier.train(dataPoint[2], dataPoint[1]['text']) #only uses text of the example
-        #     else: #dev set -- only classify once training data all inputted
-        #     #need dev/val and test sets??
-        #         classification = classifier.classify(dataPoint[1]['text'])
-        #         numTotal += 1
-        #         #print classification
-        #         if classification == dataPoint[2]:
-        #             numCorrect += 1
-        #         testResults[0].append(dataPoint[2])
-        #         testResults[1].append(classification)
-        # precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
-        # print "Baseline NB TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
-
     elif argv[3] == "sgd":
         classifier = sgd.SGD(20) #(numIterations, eta)
         for i, fold in enumerate(folds):
@@ -162,22 +130,6 @@ def main(argv):
             print "Baseline SGD TEST scores for fold %d:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (i, precision, recall, fscore)
             results.append(numCorrect)
 
-        # old code just in case
-        # trainSet = labeledData[:numTrain] #training set
-        # testSet = labeledData[numTrain:] #need dev and test set??
-        # weights = classifier.perform_sgd(trainSet) #uses text and title of the example
-        # #dev set -- only classify once training data all inputted
-        # for ex in testSet:
-        #     classification = classifier.classify(ex[1], weights)
-        #     numTotal += 1
-        #     print classification
-        #     if classification == ex[2]:
-        #         numCorrect += 1
-        #     testResults[0].append(ex[2])
-        #     testResults[1].append(classification)
-        # precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
-        # print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
-
     else:
         print >> sys.stderr, 'Usage: python readDate.py <directory name> <labels file name> <algorithm> ("nb" or "sgd")'
 
@@ -188,11 +140,11 @@ def main(argv):
     #print "numCorrect: " + str(numCorrect) + ' numTotal: ' + str(numTotal) + ' percentage: ' + str(float(numCorrect) / numTotal)
 
 def computeErrorBar(resultList):
-    average = float(sum(resultList)) / float(len(resultList))
+    average = float(sum(resultList)) / (float(len(resultList)))
     squaredDiffs = 0
     for result in resultList: squaredDiffs += ((result - average) ** 2)
     stdDev = math.sqrt(squaredDiffs/float(len(resultList)))
-    return (average - stdDev, average + stdDev)
+    return (average - stdDev, average + stdDev, average)
 
 if __name__ == '__main__':
     #numCorrect for each individual fold in each test (will be 50 total)
@@ -202,8 +154,11 @@ if __name__ == '__main__':
     for _ in xrange(10):
         testResults, testAverage, numTotal = main(sys.argv)
         results += testResults
-        averages.append(average)
+        averages.append(testAverage)
     # use results or averages?
-    errorBar = computeErrorBar
+    resultPercentages = [(float(result)/float(numTotal)) for result in results]
+    averagePercentages = [(float(avg)/float(numTotal)) for avg in averages]
+    beginBar, endBar, average = computeErrorBar(resultPercentages)
+    print "Error Bar: (%.3f, %.3f) with average %.3f" % (beginBar*100, endBar*100, average*100)
 
 
