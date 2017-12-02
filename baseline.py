@@ -46,7 +46,25 @@ def main(argv):
     numTotal = 0
     testResults = ([],[]) #Y, prediction
 
-    if argv[3] == "nb":
+    if argv[3] == "majority":
+        #classify every example the same
+        trainSet = labeledData[:numTrain]
+        testSet = labeledData[numTrain:]
+        numLeft = 0
+        numRight = 0
+        for ex in trainSet:
+            if ex[2] == -1:
+                numLeft += 1
+            else: numRight += 1
+        print "NUMLEFT: " + str(numLeft) + ",  NUMRIGHT: " + str(numRight)
+        majorityKlass = -1 if numLeft > numRight else 1
+        for t in testSet:
+            numTotal += 1
+            if t[2] == majorityKlass:
+                numCorrect += 1
+
+
+    elif argv[3] == "nb":
         classifier = nb_opt.NaiveBayes()
         for i in xrange(len(labeledData)):
             dataPoint = labeledData[i]

@@ -40,10 +40,8 @@ class SGD:
         #     featureDict["pos_sentiment"] += ss['pos']
         #     featureDict["neg_sentiment"] += ss['neg']
         #add parts of speech?   pos_tag(example)
-        deb1 = example['title']
-        deb2 = self.sid.polarity_scores(deb1)
-        deb3 = deb2['compound']
-        featureDict['title_sentiment'] = deb3
+        
+        featureDict['title_sentiment'] = self.sid.polarity_scores(example['title'])['compound']
         #featureDict["title_sentiment"] = self.sid.polarity_scores(example['title'])['compound']
         #featureDict["total_sentiment"] = self.sid.polarity_scores(example['text'])['compound'] #takes too long, may not be important
 
