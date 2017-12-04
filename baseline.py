@@ -9,6 +9,7 @@ import string
 import naive_bayes as nb
 import naive_bayes_optimized as nb_opt
 import sgd as sgd
+import word_vector as wv
 import semisupervised as ss
 import util
 from sklearn.metrics import precision_recall_fscore_support
@@ -31,7 +32,7 @@ def get_unigrams(text):
 	return unigrams
 
 #run baseline with: python baseline.py <directory name of data> <file name of classifications>
-#python baseline.py ../cs221-data/read-data/ ./labeled_data.txt nb/sgd 
+#python baseline.py ../cs221-data/read-data/ ./labeled_data.txt majority/nb/sgd/wv
 def main(argv):
     if len(argv) < 4:
         print >> sys.stderr, 'Usage: python baseline.py <data directory name> <labels file name> <algorithm>'
@@ -84,6 +85,30 @@ def main(argv):
 
     elif argv[3] == "sgd":
         classifier = sgd.SGD(20) #(numIterations, eta)
+        trainSet = labeledData[:numTrain] #training set
+        testSet = labeledData[numTrain:] #need dev and test set??
+        weights = classifier.perform_sgd(trainSet) #uses text and title of the example
+        #dev set -- only classify once training data all inputted
+        for ex in testSet:
+            classification = classifier.classify(ex[1], weights)
+            numTotal += 1
+            print classification
+            if classification == ex[2]:
+                numCorrect += 1
+            testResults[0].append(ex[2])
+            testResults[1].append(classification)
+        precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
+        print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+
+    elif argv[3] == "load_wv":
+        wordVectDict = util.writePretrainedWordVectorsToFile()
+        print "done pickling pretrained word vector file."
+        util.vectorizeArticles(dataList, wordVectDict)
+        print "done pickling article word vector file."
+        return
+
+    elif argv[3] == "wv":
+        classifier = wv.WordVector(20) #(numIterations, eta)
         trainSet = labeledData[:numTrain] #training set
         testSet = labeledData[numTrain:] #need dev and test set??
         weights = classifier.perform_sgd(trainSet) #uses text and title of the example

@@ -8,6 +8,7 @@ import numpy as np
 import os
 import csv
 import string
+import cPickle as pkl
 
 
 
@@ -91,3 +92,38 @@ def dotProduct(d1, d2):
     else:
         return sum(d1.get(f, 0) * v for f, v in d2.items())
 
+def addVectors(a,b):
+        #zero-fills?
+        if len(a) < len(b):
+            c = b.copy()
+            c[:len(a)] += a
+            return c
+        else:
+            c = a.copy()
+            c[:len(b)] += b
+            return c
+
+def writePretrainedWordVectorsToFile():
+    wordVectDict = {}
+    fr = open("../cs221-data/glove.42B.300d.txt", 'rb') 
+    for line in fr:
+            vectTerms = line.split()
+            wordVectDict[vectTerms[0]] = vectTerms[1:]
+    fr.close()
+    print "Huge dict object created"
+    with open("pretrained_word_vector_dict2.txt",'wb') as fw:
+        pkl.dump(wordVectDict, fw)
+    fw.close()
+    return wordVectDict
+
+def vectorizeArticles(examples, wordVectDict):
+    with open("article_word_vectors2.txt", 'wb') as f:
+        for ex in examples:
+            totalVect = np.array([])
+            for word in ex.text:
+                newVect = np.array(wordVectDict[word])
+                totalVect = util.addVectors(newVect, totalVect)
+            vect = np.linalg.norm(totalVect).toList()
+            pkl.dump(vect, f)
+            print "Article added!"
+    file.close()
