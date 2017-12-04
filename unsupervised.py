@@ -40,21 +40,58 @@ def createWordCountDict(text):
             wordDict[word] = 1
     return wordDict
 
-def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, dataList, liberalSplit, conservativeSplit, wordCountList):
+def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit, conservativeSplit, wordCountList):
     if startIndex == len(sourceList):
-
+        # TO DO
         # calculate hingeLoss by testing on numDev
         # update hingeDict
+        hingeLoss = 0.0
+        classifier = nb.NaiveBayesUnsupervised()
+
+        #Training Phase
+        for liberalPoint in liberalSplit:
+            data = dataBySource[liberalPoint]
+            exampleNum = data[0]
+            wordCount = wordCountList[exampleNum]
+            classifier.train(-1, wordCount)
+        for conservativePoint in conservativeSplit:
+            data = dataBySource[conservativePoint]
+            exampleNum = data[0]
+            wordCount = wordCountList[exampleNum]
+            classifier.train(1, wordCount)
+
+        # Find the Losses
+        for liberalPoint in liberalSplit:
+            data = dataBySource[liberalPoint]
+            exampleNum = data[0]
+            #Phi(x)
+            wordCount = wordCountList[exampleNum]
+            # y
+            y = -1
+            weightsByWord = classifier.getWeights()
+            hingeLoss += max(1 - util.dotProduct(wordCount, weightsByWord) * y, 0)
+
+        for conservativePoint in conservativeSplit:
+            data = dataBySource[conservativePoint]
+            exampleNum = data[0]
+            #Phi(x)
+            wordCount = wordCountList[exampleNum]
+            # y
+            y = 1
+            weightsByWord = classifier.getWeights()
+            hingeLoss += max(1- util.dotProduct(wordCount, weightsByWord) * y, 0)
+
+        hingeDict[hingeLoss] = (liberalSplit, conservativeSplit, classifier)
     else:
         newLiberal = list(liberalSplit)
         newLiberal.append(sourceList[startIndex])
         newConservative = list(conservativeSplit)
-        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, dataList, newLiberal, newConservative, wordCountList)
+        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList)
 
         newLiberal = list(liberalSplit)
         newConservative = list(conservativeSplit)
         newConservative.append(sourceList[startIndex])
-        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, dataList, newLiberal, newConservative, wordCountList)
+        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList)
 
 
 #python unsupervised.py ../cs221-data/read-data/ ./labeled_data.txt 
@@ -91,8 +128,11 @@ def main(argv):
     # Value = Tuple ([], [], NaiveBayes()) where the first element is the liberal sources, and the second element is the conservative sources
     hingeDict = {}
 
+    testSourceList = []
+    for i in range(3):
+        testSourceList.append(sourceList[i])
     # "Dev" Phase
-    findBestSplit(hingeDict, sourceList, 0, dataBySource, dataList, [], [], wordCountList)
+    findBestSplit(hingeDict, testSourceList, 0, dataBySource, [], [], wordCountList)
 
     # Find best result from "Dev" Phase
     minLoss = float('inf')
@@ -116,21 +156,6 @@ def main(argv):
         if klass == guess:
             numTestCorrect += 1
     print "numCorrect: " + str(numTestCorrect) + ' numTotal: ' + str(total) + ' percentage: ' + str(float(numTestCorrect) / total)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
 if __name__ == '__main__':
     for _ in xrange(10):

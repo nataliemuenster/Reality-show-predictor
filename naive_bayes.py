@@ -90,9 +90,9 @@ class NaiveBayesUnsupervised:
     # maps word --> class --> instances of word in class
     #self.wordCounts = collections.defaultdict(lambda: collections.defaultdict(lambda: 0))
     
-    self.wordCountsForClass = collections.defaultdict(lambda:collections.defaultdict(lambda: [0.0,0.0]))
+    self.wordCountsForClass = collections.defaultdict(lambda:collections.defaultdict(lambda: 0.0))
     self.docCount = collections.defaultdict(lambda: 0.0)
-    self.wordCounts = collections.defaultdict(lambda:[0.0,0.0])
+    self.wordCounts = collections.defaultdict(lambda: 0.0)
 
     # total number of docs
     self.nDocs = 0.0
@@ -127,13 +127,13 @@ class NaiveBayesUnsupervised:
     rightCalc = math.log(self.docCount[1] + 1)
     rightCalc -= math.log(self.docCount[1] + self.docCount[-1])
 
-    leftDenom = self.wordCounts[-1][0] + len(self.vocab) #3rd index 1 or 0??
-    rightDenom = self.wordCounts[1][0] + len(self.vocab)
+    leftDenom = self.wordCounts[-1] + len(self.vocab) #3rd index 1 or 0??
+    rightDenom = self.wordCounts[1] + len(self.vocab)
 
     for word in uniqueWords:
-        rightCalc += math.log(self.wordCountsForClass[1][word][0] + 1)
+        rightCalc += math.log(self.wordCountsForClass[1][word] + 1)
         rightCalc -= math.log(rightDenom)
-        leftCalc += math.log(self.wordCountsForClass[-1][word][0] + 1)
+        leftCalc += math.log(self.wordCountsForClass[-1][word] + 1)
         leftCalc -= math.log(leftDenom)
 
     if rightCalc > leftCalc:
@@ -149,13 +149,21 @@ class NaiveBayesUnsupervised:
     for word in wordCount:
       self.vocab.add(word) #build vocabulary of unique words for pos and neg classes
       uniqueWords.add(word)
-      self.wordCounts[klass][0] += wordCount[word]
-      self.wordCountsForClass[klass][word][0] += wordCount[word]
+      self.wordCounts[klass] += wordCount[word]
+      self.wordCountsForClass[klass][word] += wordCount[word]
 
     self.docCount[klass] += 1
-    self.wordCounts[klass][1] += len(uniqueWords)
-    for uniq in uniqueWords:
-      self.wordCountsForClass[klass][uniq][1] += 1
 
     self.nDocs += 1
+
+  # returns our word count Dictionary, and the number of words in the denom SMOOTHED for liberal and conservative respectively.
+  def getWeights():
+    newWordCounts = {}
+    newWordCounts[-1] = dict(self.wordCountsForClass[-1])
+    newWordCounts[1] = dict(self.wordCountsForClass[1])
+    for word in newWordCounts[-1]:
+      newWordCounts[-1][word] = float(newWordCounts[-1][word]) / (self.wordCounts[-1] + len(self.vocab))
+    for word in newWordCounts[1]:
+      newWordCounts[1][word] = float(newWordCounts[1][word]) / (self.wordCounts[1] + len(self.vocab))
+    return newWordCounts
 
