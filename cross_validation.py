@@ -86,6 +86,8 @@ def main(argv):
     if argv[3] == "majority":
         #crossValidation:
         for i, fold in enumerate(folds):
+            numTotal = 0
+            numCorrect = 0
             trainSet = getTrainFolds(folds, i)
             testSet = getTestFolds(folds, i)
             numLeft = 0
@@ -105,8 +107,10 @@ def main(argv):
         classifier = nb_opt.NaiveBayes()
         #cross-validation
         for i, fold in enumerate(folds):
-            trainSet = getTrainFolds(i)
-            testSet = getTestFolds(i)
+            numTotal = 0
+            numCorrect = 0
+            trainSet = getTrainFolds(folds, i)
+            testSet = getTestFolds(folds, i)
             for dataPoint in trainSet:
                 classifier.train(dataPoint[2], dataPoint[1]['text'])
             for dataPoint in testSet:
@@ -119,13 +123,16 @@ def main(argv):
                 testResults[1].append(classification)
             precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
             print "Baseline NB TEST scores for fold %d:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (i, precision, recall, fscore)
+            print "numCorrect: %d numTotal: %d Accuracy: %d" % (numCorrect, numTotal, float(numCorrect)/float(numTotal))
             results.append(numCorrect)
 
     elif argv[3] == "sgd":
         classifier = sgd.SGD(20) #(numIterations, eta)
         for i, fold in enumerate(folds):
-            trainSet = getTrainFolds(i) #training set
-            testSet = getTestFolds(i) #need dev and test set??
+            numTotal = 0
+            numCorrect = 0
+            trainSet = getTrainFolds(folds, i) #training set
+            testSet = getTestFolds(folds, i) #need dev and test set??
             weights = classifier.perform_sgd(trainSet) #uses text and title of the example
             #dev set -- only classify once training data all inputted
             for ex in testSet:
@@ -154,7 +161,10 @@ def computeErrorBar(resultList):
     squaredDiffs = 0
     for result in resultList: squaredDiffs += ((result - average) ** 2)
     stdDev = math.sqrt(squaredDiffs/float(len(resultList)))
-    return (average - stdDev, average + stdDev, average)
+    lowerBar = average - stdDev if average - stdDev > 0 else 0
+    upperBar = average + stdDev if average + stdDev < 1 else .99999
+    return (lowerBar, upperBar, average)
+    #return (average - stdDev, average + stdDev, average)
 
 if __name__ == '__main__':
     #numCorrect for each individual fold in each test (will be 50 total)
@@ -167,8 +177,8 @@ if __name__ == '__main__':
         averages.append(testAverage)
     # use results or averages?
     resultPercentages = [(float(result)/float(numTotal)) for result in results]
-    averagePercentages = [(float(avg)/float(numTotal)) for avg in averages]
-    beginBar, endBar, average = computeErrorBar(resultPercentages)
-    print "Error Bar: (%.5f, %.5f) with average accuracy %.5f" % (beginBar, endBar, average)
+    #averagePercentages = [(float(avg)/float(numTotal)) for avg in averages]
+    lowerBar, upperBar, average = computeErrorBar(resultPercentages)
+    print "Error Bar: (%.5f, %.5f) with average accuracy %.5f" % (lowerBar, upperBar, average)
 
 
