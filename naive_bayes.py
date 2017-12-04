@@ -83,3 +83,42 @@ class NaiveBayes:
 
     self.nDocs += 1
 
+class NaiveBayesUnsupervised:
+  def __init__(self):
+    # maps class to list of [word count, doc count]
+    #self.classCounts = collections.defaultdict(lambda: [0, 0])
+    # maps word --> class --> instances of word in class
+    #self.wordCounts = collections.defaultdict(lambda: collections.defaultdict(lambda: 0))
+    
+    self.wordCountsForClass = collections.defaultdict(lambda:collections.defaultdict(lambda: 0.0))
+    self.docCount = collections.defaultdict(lambda: 0.0)
+    self.wordCounts = collections.defaultdict(lambda: 0.0)
+
+    # total number of docs
+    self.nDocs = 0.0
+    self.vocab = set()
+
+  #takes in text in doc and the doc's class
+  def train(self, klass, wordCount):
+    # number of appearances of word in docs with classification klass
+    for word in wordCount:
+      self.vocab.add(word) #build vocabulary of unique words for pos and neg classes
+      self.wordCounts[klass] += wordCount[word]
+      self.wordCountsForClass[klass][word] += wordCount[word]
+
+    self.docCount[klass] += 1
+
+    self.nDocs += 1
+
+  # returns our word count Dictionary, and the number of words in the denom SMOOTHED for liberal and conservative respectively.
+  def getWeights(self):
+    return self.wordCountsForClass
+    newWordCounts = {}
+    newWordCounts[-1] = dict(self.wordCountsForClass[-1])
+    newWordCounts[1] = dict(self.wordCountsForClass[1])
+    for word in newWordCounts[-1]:
+      newWordCounts[-1][word] = float(newWordCounts[-1][word])# / (self.wordCounts[-1] + len(self.vocab))
+    for word in newWordCounts[1]:
+      newWordCounts[1][word] = float(newWordCounts[1][word])# / (self.wordCounts[1] + len(self.vocab))
+    return newWordCounts
+
