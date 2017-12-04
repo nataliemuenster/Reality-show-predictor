@@ -96,59 +96,13 @@ class NaiveBayesUnsupervised:
 
     # total number of docs
     self.nDocs = 0.0
-    self.vocab = set() #build vocabulary of unique words for pos and neg classes
-    self.stopWords = self.readStopWordsFile('./english.stop')
-
-  def readStopWordsFile(self, fileName):
-    contents = []
-    f = open(fileName)
-    for line in f:
-      contents.append(line)
-    f.close()
-    return ('\n'.join(contents)).split()
-
-  def filterStopWords(self, words):
-    """Filters stop words."""
-    filtered = []
-    for word in words:
-      if not word in self.stopWords and word.strip() != '':
-        filtered.append(word)
-    return filtered
-
-
-  def classify(self, wordCount):
-    uniqueWords = set()
-    for word in wordCount:
-      uniqueWords.add(word)
-    
-    klass = -1
-    leftCalc = math.log(self.docCount[-1] + 1)
-    leftCalc -= math.log(self.docCount[1] + self.docCount[-1])
-    rightCalc = math.log(self.docCount[1] + 1)
-    rightCalc -= math.log(self.docCount[1] + self.docCount[-1])
-
-    leftDenom = self.wordCounts[-1] + len(self.vocab) #3rd index 1 or 0??
-    rightDenom = self.wordCounts[1] + len(self.vocab)
-
-    for word in uniqueWords:
-        rightCalc += math.log(self.wordCountsForClass[1][word] + 1)
-        rightCalc -= math.log(rightDenom)
-        leftCalc += math.log(self.wordCountsForClass[-1][word] + 1)
-        leftCalc -= math.log(leftDenom)
-
-    if rightCalc > leftCalc:
-      klass = 1
-
-    return klass
-
+    self.vocab = set()
 
   #takes in text in doc and the doc's class
   def train(self, klass, wordCount):
     # number of appearances of word in docs with classification klass
-    uniqueWords = set()
     for word in wordCount:
       self.vocab.add(word) #build vocabulary of unique words for pos and neg classes
-      uniqueWords.add(word)
       self.wordCounts[klass] += wordCount[word]
       self.wordCountsForClass[klass][word] += wordCount[word]
 
@@ -157,13 +111,14 @@ class NaiveBayesUnsupervised:
     self.nDocs += 1
 
   # returns our word count Dictionary, and the number of words in the denom SMOOTHED for liberal and conservative respectively.
-  def getWeights():
+  def getWeights(self):
+    return self.wordCountsForClass
     newWordCounts = {}
     newWordCounts[-1] = dict(self.wordCountsForClass[-1])
     newWordCounts[1] = dict(self.wordCountsForClass[1])
     for word in newWordCounts[-1]:
-      newWordCounts[-1][word] = float(newWordCounts[-1][word]) / (self.wordCounts[-1] + len(self.vocab))
+      newWordCounts[-1][word] = float(newWordCounts[-1][word])# / (self.wordCounts[-1] + len(self.vocab))
     for word in newWordCounts[1]:
-      newWordCounts[1][word] = float(newWordCounts[1][word]) / (self.wordCounts[1] + len(self.vocab))
+      newWordCounts[1][word] = float(newWordCounts[1][word])# / (self.wordCounts[1] + len(self.vocab))
     return newWordCounts
 
