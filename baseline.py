@@ -101,10 +101,11 @@ def main(argv):
         print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
 
     elif argv[3] == "load_wv":
-        wordVectDict = util.writePretrainedWordVectorsToFile()
-        print "done pickling pretrained word vector file."
-        util.vectorizeArticles(dataList, wordVectDict)
-        print "done pickling article word vector file."
+        #wordVectDict = util.writePretrainedWordVectorsToFile()
+        #print "done pickling pretrained word vector file."
+        #util.vectorizeArticles2(dataList, wordVectDict)
+        #print "done pickling article word vector file."
+        util.vectorizeArticles(dataList)
         return
 
     elif argv[3] == "wv":
