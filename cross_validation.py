@@ -44,6 +44,16 @@ def getFolds(dataList, nFolds=5):
             folds.append(dataList[startIndex:endIndex])
     return folds
 
+def getTestFolds(folds, testIndex=0):
+    return folds[testIndex]
+
+def getTrainFolds(folds, testIndex=0):
+    trainFolds = []
+    for i, fold in enumerate(folds):
+        if i != testIndex:
+            trainFolds += fold
+    return trainFolds
+
 #run cross_validation with: python cross_validation.py <directory name of data> <file name of classifications>
 #python cross_validation.py ../cs221-data/read-data/ ./labeled_data.txt nb/sgd 
 def main(argv):
@@ -61,23 +71,23 @@ def main(argv):
     numTotal = 0
     testResults = ([],[]) #Y, prediction
 
-    def getTestFolds(testIndex):
-        return folds[testIndex]
+    # def getTestFolds(testIndex=0):
+    #     return folds[testIndex]
 
-    def getTrainFolds(testIndex):
-        trainFolds = []
-        for i, fold in enumerate(folds):
-            if i != testIndex:
-                trainFolds += fold
-        return trainFolds
+    # def getTrainFolds(testIndex=0):
+    #     trainFolds = []
+    #     for i, fold in enumerate(folds):
+    #         if i != testIndex:
+    #             trainFolds += fold
+    #     return trainFolds
 
     #list of percentage correct in each run
     results = []
     if argv[3] == "majority":
         #crossValidation:
         for i, fold in enumerate(folds):
-            trainSet = getTrainFolds(i)
-            testSet = getTestFolds(i)
+            trainSet = getTrainFolds(folds, i)
+            testSet = getTestFolds(folds, i)
             numLeft = 0
             numRight = 0
             for ex in trainSet:
@@ -97,9 +107,9 @@ def main(argv):
         for i, fold in enumerate(folds):
             trainSet = getTrainFolds(i)
             testSet = getTestFolds(i)
-            for i, dataPoint in enumerate(trainSet):
+            for dataPoint in trainSet:
                 classifier.train(dataPoint[2], dataPoint[1]['text'])
-            for i, dataPoint in enumerate(testSet):
+            for dataPoint in testSet:
                 classification = classifier.classify(dataPoint[1]['text'])
                 numTotal += 1
                 #print classification
@@ -159,6 +169,6 @@ if __name__ == '__main__':
     resultPercentages = [(float(result)/float(numTotal)) for result in results]
     averagePercentages = [(float(avg)/float(numTotal)) for avg in averages]
     beginBar, endBar, average = computeErrorBar(resultPercentages)
-    print "Error Bar: (%.3f, %.3f) with average %.3f" % (beginBar*100, endBar*100, average*100)
+    print "Error Bar: (%.5f, %.5f) with average accuracy %.5f" % (beginBar, endBar, average)
 
 
