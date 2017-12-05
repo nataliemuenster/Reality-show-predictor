@@ -36,12 +36,16 @@ class NaiveBayes:
     return filtered
 
 
-  def classify(self, text):
-    words = text.translate(None, string.punctuation).lower().split()
-    words = self.filterStopWords(words)
+  def classify(self, text, isUnsupervised):
     uniqueWords = set()
-    for word in words:
-      uniqueWords.add(word)
+    if isUnsupervised:
+      uniqueWords = text
+    else:
+      words = text.translate(None, string.punctuation).lower().split()
+      words = self.filterStopWords(words)
+      uniqueWords = set()
+      for word in words:
+        uniqueWords.add(word)
 
     polarizingWords = set() #will this work??
     numPolar = 0
@@ -59,17 +63,17 @@ class NaiveBayes:
     rightCalc = math.log(self.docCount[1] + 1)
     rightCalc -= math.log(self.docCount[1] + self.docCount[-1])
 
-    leftDenom = self.wordCounts[-1][0] + len(self.vocab) #3rd index 1 or 0??
-    rightDenom = self.wordCounts[1][0] + len(self.vocab)
+    leftDenom = self.wordCounts[-1][1] + len(self.vocab) #3rd index 1 or 0??
+    rightDenom = self.wordCounts[1][1] + len(self.vocab)
 
     for word in uniqueWords:
         multiplier = 1
         if (word in polarizingWords):
           multiplier = 3
 
-        rightCalc += math.log((self.wordCountsForClass[1][word][0] + 1)**multiplier)
+        rightCalc += math.log((self.wordCountsForClass[1][word][1] + 1)**multiplier)
         rightCalc -= math.log(rightDenom)
-        leftCalc += math.log((self.wordCountsForClass[-1][word][0] + 1)**multiplier)
+        leftCalc += math.log((self.wordCountsForClass[-1][word][1] + 1)**multiplier)
         leftCalc -= math.log(leftDenom)
 
     if rightCalc > leftCalc:
@@ -79,21 +83,28 @@ class NaiveBayes:
 
 
   #takes in text in doc and the doc's class
-  def train(self, klass, text):
-    words = text.translate(None, string.punctuation).lower().split()
-    words = self.filterStopWords(words)
-    # number of appearances of word in docs with classification klass
-    uniqueWords = set()
-    for word in words:
-      self.vocab.add(word) #build vocabulary of unique words for pos and neg classes
-      uniqueWords.add(word)
-      self.wordCounts[klass][0] += 1
-      self.wordCountsForClass[klass][word][0] += 1
+  def train(self, klass, text, isUnsupervised):
+    if isUnsupervised:
+      self.wordCounts[klass][1] += len(text)
+      self.docCount[klass] += 1
+      for uniq in text:
+        self.wordCountsForClass[klass][uniq][1] += 1
+        self.vocab.add(uniq)
+    else:
+      words = text.translate(None, string.punctuation).lower().split()
+      words = self.filterStopWords(words)
+      # number of appearances of word in docs with classification klass
+      uniqueWords = set()
+      for word in words:
+        self.vocab.add(word) #build vocabulary of unique words for pos and neg classes
+        uniqueWords.add(word)
+        self.wordCounts[klass][0] += 1
+        self.wordCountsForClass[klass][word][0] += 1
 
-    self.docCount[klass] += 1
-    self.wordCounts[klass][1] += len(uniqueWords)
-    for uniq in uniqueWords:
-      self.wordCountsForClass[klass][uniq][1] += 1
+      self.docCount[klass] += 1
+      self.wordCounts[klass][1] += len(uniqueWords)
+      for uniq in uniqueWords:
+        self.wordCountsForClass[klass][uniq][1] += 1
 
-    self.nDocs += 1
+      self.nDocs += 1
 
