@@ -104,13 +104,14 @@ def main(argv):
             results.append(numCorrect)
 
     elif argv[3] == "nb":
-        classifier = nb_opt.NaiveBayes()
+        #classifier = nb_opt.NaiveBayes()
         #cross-validation
         for i, fold in enumerate(folds):
             numTotal = 0
             numCorrect = 0
             trainSet = getTrainFolds(folds, i)
             testSet = getTestFolds(folds, i)
+            classifier = nb_opt.NaiveBayes()
             for dataPoint in trainSet:
                 classifier.train(dataPoint[2], dataPoint[1]['text'])
             for dataPoint in testSet:
@@ -123,12 +124,13 @@ def main(argv):
                 testResults[1].append(classification)
             precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
             print "Baseline NB TEST scores for fold %d:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (i, precision, recall, fscore)
-            print "numCorrect: %d numTotal: %d Accuracy: %d" % (numCorrect, numTotal, float(numCorrect)/float(numTotal))
+            print "numCorrect: %d numTotal: %d Accuracy: %d" % (numCorrect, numTotal, (float(numCorrect)/float(numTotal)))
             results.append(numCorrect)
 
     elif argv[3] == "sgd":
-        classifier = sgd.SGD(20) #(numIterations, eta)
+        #classifier = sgd.SGD(20) #(numIterations, eta)
         for i, fold in enumerate(folds):
+            classifier = sgd.SGD(20)
             numTotal = 0
             numCorrect = 0
             trainSet = getTrainFolds(folds, i) #training set
