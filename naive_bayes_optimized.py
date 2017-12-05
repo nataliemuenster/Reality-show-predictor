@@ -17,8 +17,6 @@ class NaiveBayes:
     # total number of docs
     self.nDocs = 0.0
     self.vocab = set() #build vocabulary of unique words for pos and neg classes
-    self.leftWords = [] #HARDCODE THESE
-    self.rightWords = []
     self.stopWords = self.readStopWordsFile('./english.stop')
 
   def readStopWordsFile(self, fileName):
@@ -50,13 +48,15 @@ class NaiveBayes:
         uniqueWords.add(word)
 
     polarizingWords = set() #will this work??
+    numPolar = 0
     for word in uniqueWords:
         diff = math.fabs(self.wordCountsForClass[1][word][0] - self.wordCountsForClass[-1][word][0])
-        #print diff, word, self.wordCountsForPosClass[word][bflag], self.wordCountsForNegClass[word][bflag]
-        if diff > 40: #optimize this...? This number taken from 124
+        #print diff, word, self.wordCountsForClass[1][word][0], self.wordCountsForClass[-1][word][0]
+        if diff > 40: #optimize this more...?
+          numPolar += 1
           polarizingWords.add(word)
     #print polarizingWords
-    
+    #print "numPolar: " + str(numPolar)
     klass = -1
     leftCalc = math.log(self.docCount[-1] + 1)
     leftCalc -= math.log(self.docCount[1] + self.docCount[-1])
