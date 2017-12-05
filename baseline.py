@@ -69,10 +69,10 @@ def main(argv):
         for i in xrange(len(labeledData)):
             dataPoint = labeledData[i]
             if i < numTrain: #training set
-                classifier.train(dataPoint[2], dataPoint[1]['text']) #only uses text of the example
+                classifier.train(dataPoint[2], dataPoint[1]['text'], False) #only uses text of the example
             else: #dev set -- only classify once training data all inputted
             #need dev/val and test sets??
-                classification = classifier.classify(dataPoint[1]['text'])
+                classification = classifier.classify(dataPoint[1]['text'], False)
                 numTotal += 1
                 #print classification
                 if classification == dataPoint[2]:
