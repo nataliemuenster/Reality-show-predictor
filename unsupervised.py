@@ -42,6 +42,8 @@ def createWordCountDict(text):
 
 def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit, conservativeSplit, wordCountList, devData):
     if startIndex == len(sourceList):
+        if len(liberalSplit) < 5 or len(conservativeSplit) < 5:
+            return
         # TO DO
         # calculate hingeLoss by testing on numDev
         # update hingeDict
@@ -56,8 +58,8 @@ def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit,
             data = dataBySource[liberalPoint]
             for dataPoint in data:
                 exampleNum = dataPoint[0]
-                if exampleNum >= 100:
-                    continue
+                #if exampleNum >= 10000:
+                #    continue
                 wordCount = wordCountList[exampleNum]
                 classifier.train(-1, wordCount, True)
         print "cons"
@@ -65,8 +67,8 @@ def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit,
             data = dataBySource[conservativePoint]
             for dataPoint in data:
                 exampleNum = dataPoint[0]
-                if exampleNum >= 100:
-                    continue
+                #if exampleNum >= 10000:
+                #    continue
                 wordCount = wordCountList[exampleNum]
                 classifier.train(1, wordCount, True)
         # Dev Phase 
@@ -75,7 +77,16 @@ def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit,
         for i in range(total):
             dataPoint = devData[i]
             klass = dataPoint[2]
-            guess = classifier.classify(wordCountList[dataPoint[0]], True)
+            exampleNum = dataPoint[0]
+            guess = None
+            if exampleNum < len(wordCountList):
+                guess = classifier.classify(wordCountList[exampleNum], True)
+                print "guess " + str(guess)
+                print "klass " + str(klass)
+
+            else:
+                print "skip"
+                continue
             if guess == klass:
                 numTestCorrect += 1
         accuracy = float(numTestCorrect) / total
@@ -103,19 +114,22 @@ def main(argv):
     classificationDict = util.createClassDict(argv[2])
     dataList = util.readFiles(argv[1], classificationDict) #if no classificationDict passed in, randomized
 
+    wordCountList = []
+    counter = 0
+    for value in dataList:
+        wordCountList.append(createWordCountDict(value[1]['text']))
+        counter += 1
+        #if counter == 10000:
+        #    break
+        if counter % 5000 == 0:
+            print counter
+    print len(wordCountList)
+
     # index in list = exampleNum
     # value at index = wordcountDict
     print "hi"
     labeledData, unlabeledData = util.separateLabeledExamples(dataList)
-
     
-    wordCountList = []
-    for value in dataList:
-        wordCountList.append(createWordCountDict(value[1]['text']))
-    
-    with open("./unsupervised_preprocess.txt", "w"):
-        pkl.dump(wordCountList, f)
-
 
     #print wordCountList[0]
 
@@ -140,6 +154,7 @@ def main(argv):
         if dataPoint[1]['publication'] in dataBySource:
             dataBySource[dataPoint[1]['publication']].append(dataPoint)
         else:
+            print dataPoint[1]['publication']
             sourceList.append(dataPoint[1]['publication'])
             dataBySource[dataPoint[1]['publication']] = [dataPoint]
     # Key = hinge loss. The smallest key will be the one with the lowest global loss and best assignment
@@ -147,7 +162,7 @@ def main(argv):
     hingeDict = {}
 
     testSourceList = []
-    for i in range(3):
+    for i in range(len(sourceList)):
         testSourceList.append(sourceList[i])
     print testSourceList
     print sourceList
@@ -156,21 +171,28 @@ def main(argv):
     print "finished"
     print hingeDict
     # Find best result from "Dev" Phase
-    minLoss = float('inf')
+    bestKey = float('-inf')
     splitTuple = None
-    for lossKey in hingeDict:
-        if lossKey < minLoss:
-            minLoss = lossKey
-            splitTuple = hingeDict[lossKey]
+    for accuracyKey in hingeDict:
+        if accuracyKey > bestKey:
+            bestKey = accuracyKey
+            splitTuple = hingeDict[accuracyKey]
     print splitTuple
-    print minLoss
+    print bestKey
     # Test Phase
     numTestCorrect = 0
     total = len(testData)
     for i in range(total):
         dataPoint = testData[i]
         klass = dataPoint[2]
-        guess = splitTuple[2].classify(wordCountList[dataPoint[0]], True)
+        exampleNum = dataPoint[0]
+        print exampleNum
+        if exampleNum < len(wordCountList):
+            guess = splitTuple[2].classify(wordCountList[dataPoint[0]], True)
+            print guess
+        else:
+            print "skip"
+            continue
         if guess == klass:
             numTestCorrect += 1
     print "numCorrect: " + str(numTestCorrect) + ' numTotal: ' + str(total) + ' percentage: ' + str(float(numTestCorrect) / total)
