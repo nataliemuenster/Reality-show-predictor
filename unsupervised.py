@@ -40,10 +40,16 @@ def createWordCountDict(text):
         uniqueWords.add(word)
     return uniqueWords
 
-def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit, conservativeSplit, wordCountList, devData):
+def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit, conservativeSplit, wordCountList, devData, trainLen):
     if startIndex == len(sourceList):
         if len(liberalSplit) < 5 or len(conservativeSplit) < 5:
             return
+        #if not len(liberalSplit) == 5 or not len(conservativeSplit) == 5:
+        #    return
+        #if not len(liberalSplit) == 6 or not len(conservativeSplit) == 6:
+        #    return
+        #if not len(liberalSplit) == 4 or not len(conservativeSplit) == 4:
+        #    return   
         # TO DO
         # calculate hingeLoss by testing on numDev
         # update hingeDict
@@ -97,12 +103,12 @@ def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit,
         newLiberal = list(liberalSplit)
         newLiberal.append(sourceList[startIndex])
         newConservative = list(conservativeSplit)
-        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList, devData)
+        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList, devData, trainLen)
 
         newLiberal = list(liberalSplit)
         newConservative = list(conservativeSplit)
         newConservative.append(sourceList[startIndex])
-        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList, devData)
+        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList, devData, trainLen)
 
 
 #python unsupervised.py ../cs221-data/read-data/ ./labeled_data.txt 
@@ -134,9 +140,12 @@ def main(argv):
     #print wordCountList[0]
 
     devLen = len(labeledData) / 2
+    trainLen = len(unlabeledData) / 2
     devData = []
     testData = []
+    random.seed(9001)
     random.shuffle(labeledData)
+    random.shuffle(unlabeledData)
     for i in range(len(labeledData)):
         if i < devLen:
             devData.append(labeledData[i])
@@ -167,7 +176,7 @@ def main(argv):
     print testSourceList
     print sourceList
     # "Dev" Phase
-    findBestSplit(hingeDict, testSourceList, 0, dataBySource, [], [], wordCountList, devData)
+    findBestSplit(hingeDict, testSourceList, 0, dataBySource, [], [], wordCountList, devData, trainLen)
     print "finished"
     print hingeDict
     # Find best result from "Dev" Phase
