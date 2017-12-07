@@ -46,6 +46,8 @@ def readFiles(directoryName, classificationDict = {}):
 				if firstLine:
 					firstLine = False
 				else:
+					if line[3] == 'publication' or line[3] == 'Vox' or line[3] == 'Washington Post' or line[3] == 'Reuters':
+						continue
 					fullText = line[2] + ' ' + line[9].replace('\n', '')
 					dataList.append((exampleNum, {
 							'title': line[2],
