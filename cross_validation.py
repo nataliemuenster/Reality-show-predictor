@@ -174,7 +174,7 @@ if __name__ == '__main__':
     results = []
     #average of numCorrect for each test (will be 10 total)
     averages = []
-    for _ in xrange(3): #change back to 10
+    for _ in xrange(10): 
         testResults, testAverage, numTotal = main(sys.argv)
         results += testResults
         averages.append(testAverage)
