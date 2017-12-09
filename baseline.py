@@ -67,6 +67,7 @@ def main(argv):
 
     elif argv[3] == "nb":
         classifier = nb_opt.NaiveBayes()
+        #classifier.setN(2)
         for i in xrange(len(labeledData)):
             dataPoint = labeledData[i]
             if i < numTrain: #training set

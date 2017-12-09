@@ -112,6 +112,7 @@ def main(argv):
             trainSet = getTrainFolds(folds, i)
             testSet = getTestFolds(folds, i)
             classifier = nb_opt.NaiveBayes()
+            #classifier.setN(2)
             for dataPoint in trainSet:
                 classifier.train(dataPoint[2], dataPoint[1]['text'])
             for dataPoint in testSet:
@@ -173,7 +174,7 @@ if __name__ == '__main__':
     results = []
     #average of numCorrect for each test (will be 10 total)
     averages = []
-    for _ in xrange(10):
+    for _ in xrange(3): #change back to 10
         testResults, testAverage, numTotal = main(sys.argv)
         results += testResults
         averages.append(testAverage)
