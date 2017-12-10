@@ -7,11 +7,8 @@ import os
 import csv
 import string
 import util
-import time 
-import kmeans
-from sklearn.metrics import precision_recall_fscore_support
+import time
 import naive_bayes_optimized as nb_opt
-import cPickle as pkl
 
 
 
@@ -49,7 +46,7 @@ def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit,
            
 
         #Jeff uncomments this
-        #if len(liberalSplit) == 6 or len(conservativeSplit) == 6:
+        if len(liberalSplit) == 6 or len(conservativeSplit) == 6:
 
         # natalie uncomments this
         #if len(liberalSplit) == 4 or len(conservativeSplit) == 4:
@@ -146,7 +143,7 @@ def main(argv):
     trainLen = len(unlabeledData) / 2
     devData = []
     testData = []
-    random.seed(9001)
+    random.seed(500)
     random.shuffle(labeledData)
     random.shuffle(unlabeledData)
     #print labeledData[0][1]['publication']

@@ -95,11 +95,16 @@ class NaiveBayes:
     rightDenom = self.wordCounts[1][1] + len(self.vocab)
 
     for word in uniqueWords:
-        diff = math.fabs(self.wordCountsForClass[1][word][0] - self.wordCountsForClass[-1][word][0])
-        multiplier = 0
-        if diff <= (self.nDocs * .01): multiplier = .01
-        if diff > (self.nDocs * .01): multiplier = math.log(diff)
-        if (word in self.sgd_feature_names): multiplier *= 3 #tune this?
+        multiplier = 1
+        if isUnsupervised:
+          if word in polarizingWords:
+            multiplier = 3
+        else:
+          diff = math.fabs(self.wordCountsForClass[1][word][0] - self.wordCountsForClass[-1][word][0])
+          multiplier = 0
+          if diff <= (self.nDocs * .01): multiplier = .01
+          if diff > (self.nDocs * .01): multiplier = math.log(diff)
+          if (word in self.sgd_feature_names): multiplier *= 3 #tune this?
 
         #multiplier = 1
         #changed from word in polarizing words w. multiplier 3
@@ -153,21 +158,21 @@ class NaiveBayes:
         self.vocab.add(uniq)
     else:
       words = self.get_ngrams(text)
-    if self.SGD_features:
-      sgd_features = self.extract_SGD_features(text)
-      words = words + self.extract_SGD_features(text)
-      # number of appearances of n-gram in docs with classification klass
-      uniqueWords = set()
-      for word in words:
-        self.vocab.add(word) #build vocabulary of unique words for pos and neg classes
-        uniqueWords.add(word)
-        self.wordCounts[klass][0] += 1
-        self.wordCountsForClass[klass][word][0] += 1
+      if self.SGD_features:
+        sgd_features = self.extract_SGD_features(text)
+        words = words + self.extract_SGD_features(text)
+        # number of appearances of n-gram in docs with classification klass
+        uniqueWords = set()
+        for word in words:
+          self.vocab.add(word) #build vocabulary of unique words for pos and neg classes
+          uniqueWords.add(word)
+          self.wordCounts[klass][0] += 1
+          self.wordCountsForClass[klass][word][0] += 1
 
-      self.docCount[klass] += 1
-      self.wordCounts[klass][1] += len(uniqueWords)
-      for uniq in uniqueWords:
-        self.wordCountsForClass[klass][uniq][1] += 1
+        self.docCount[klass] += 1
+        self.wordCounts[klass][1] += len(uniqueWords)
+        for uniq in uniqueWords:
+          self.wordCountsForClass[klass][uniq][1] += 1
 
-      self.nDocs += 1
+        self.nDocs += 1
 
