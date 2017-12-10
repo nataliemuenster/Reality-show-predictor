@@ -47,7 +47,7 @@ def readFiles(directoryName, classificationDict = {}):
 					firstLine = False
 				else:
 					#balances data set a bit more
-					if line[3] == 'publication' or line[3] == 'Vox' or line[3] == 'Washington Post' or line[3] == 'Reuters': #or line[2] == "Wonders of the universe":
+					if line[3] == 'publication' or line[3] == 'Vox' or line[3] == 'Washington Post' or line[3] == 'Reuters':
 						continue
 					fullText = line[2] + ' ' + line[9].replace('\n', '')
 					dataList.append((exampleNum, {
