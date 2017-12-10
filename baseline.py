@@ -101,22 +101,19 @@ def main(argv):
         precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
         print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
 
+    #load pretrained word vector data and store article vectors. Only needd to be run once ever as preprocessing.
     elif argv[3] == "load_wv":
-        #wordVectDict = util.writePretrainedWordVectorsToFile()
-        #print "done pickling pretrained word vector file."
-        #util.vectorizeArticles2(dataList, wordVectDict)
-        #print "done pickling article word vector file."
         util.vectorizeArticles(dataList)
         return
 
     elif argv[3] == "wv":
-        classifier = wv.WordVector(20) #(numIterations, eta)
+        classifier = wv.WordVector(len(dataList),20) #(numArticles, numIterations, eta)
         trainSet = labeledData[:numTrain] #training set
         testSet = labeledData[numTrain:] #need dev and test set??
         weights = classifier.perform_sgd(trainSet) #uses text and title of the example
         #dev set -- only classify once training data all inputted
         for ex in testSet:
-            classification = classifier.classify(ex[1], weights)
+            classification = classifier.classify(ex, weights)
             numTotal += 1
             print classification
             if classification == ex[2]:
@@ -134,6 +131,6 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    for _ in xrange(10):
-        main(sys.argv)
+    #for _ in xrange(10):
+    main(sys.argv)
 

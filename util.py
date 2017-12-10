@@ -46,6 +46,7 @@ def readFiles(directoryName, classificationDict = {}):
 				if firstLine:
 					firstLine = False
 				else:
+					#balances data set a bit more
 					if line[3] == 'publication' or line[3] == 'Vox' or line[3] == 'Washington Post' or line[3] == 'Reuters':
 						continue
 					fullText = line[2] + ' ' + line[9].replace('\n', '')
@@ -111,63 +112,62 @@ def dotProduct(d1, d2):
         return sum(d1.get(f, 0) * v for f, v in d2.items())
 
 def addVectors(a,b):
-        #zero-fills?
-        if len(a) < len(b):
-            c = b.copy()
-            c[:len(a)] += a
-            return c
-        else:
-            c = a.copy()
-            c[:len(b)] += b
-            return c
+    if len(a) < len(b):
+        #c = list(b)
+        c = [float(a[i]) + float(b[i]) for i in xrange(len(a))]
+        #c[:len(a)] += a
+        for j in xrange(len(a), len(b)):
+	        c.append(float(b[j]))
+        return c
+    else:
+        #c = list(a)
+        #c[:len(b)] += b
+        c = [float(a[i]) + float(b[i]) for i in xrange(len(b))]
+        #c[:len(a)] += a
+        for j in xrange(len(b), len(a)):
+	        c.append(float(a[j]))
+        return c
 
-def writePretrainedWordVectorsToFile():
-    wordVectDict = {}
-    fr = open("../cs221-data/glove.42B.300d.txt", 'rb') 
-    for line in fr:
-            vectTerms = line.split()
-            wordVectDict[vectTerms[0]] = vectTerms[1:]
-    fr.close()
-    print "Huge dict object created"
-    with open("pretrained_word_vector_dict2.txt",'wb') as fw:
-        pkl.dump(wordVectDict, fw)
-    fw.close()
-    return wordVectDict
-
-def vectorizeArticles2(examples, wordVectDict):
-    with open("article_word_vectors2.txt", 'wb') as f:
-        for ex in examples:
-            totalVect = np.array([])
-            for word in ex.text:
-                newVect = np.array(wordVectDict[word])
-                totalVect = util.addVectors(newVect, totalVect)
-            vect = np.linalg.norm(totalVect).toList()
-            pkl.dump(vect, f)
-            print "Article added!"
-    file.close()
+def incrementVectors(a, scale, b):
+    #[weights[f] + v * self.eta for f, v in gradientLoss.items()]
+    if len(a) < len(b):
+        c = list(b)
+        for i in xrange(len(c)):
+            c[i] *= scale
+        c[:len(a)] += a
+        return c
+    else:
+        c = list(a)
+        c[:len(b)] += b*scale
+        return c
 
 def vectorizeArticles(examples):
     wordVectDict = {}
-    fr = open("../cs221-data/glove.42B.300d.txt", 'rb') 
+    fr = open("../cs221-data/glove.6B.50d.txt", 'rb') 
     for line in fr:
             vectTerms = line.split()
             wordVectDict[vectTerms[0]] = vectTerms[1:]
+            #print "WORD VECTOR FOR " + str(vectTerms[0]) + str(wordVectDict[vectTerms[0]])
     fr.close()
-
-    stopWords = util.readStopWordsFile()
-
-    fw = open("article_word_vectors.txt",'w')
-    num = 0
+    #stopWords = readStopWordsFile()
     print "about to build article vectors"
+    fw = open("article_word_vectors_debug.txt",'w')
+    num = 0
+    
     for ex in examples:
         num += 1
         if num % 100 == 0: print str(num) + " examples done!"
-        totalVect = np.array([])
-        words = util.filterStopWords(stopWords, ex.txt)
+        totalVect = []
+        words = ex[1]['text'].translate(None, string.punctuation).lower().split()
+        #words = filterStopWords(stopWords, ex[1]['text'])
+        
         for word in words:
-            newVect = np.array(wordVectDict[word])
-            totalVect = util.addVectors(newVect, totalVect)
-        vect = np.linalg.norm(totalVect).toList()
-        fw.write(vect)
+            if word in wordVectDict:
+                newVect = wordVectDict[word]
+                totalVect = addVectors(newVect, totalVect)
+                #print "TOTAL VECT combined words = " + str(totalVect)
+        vectString = str(ex[0]) + ":" + ' '.join(str(x) for x in totalVect)
+        #vectString = ' '.join(totalVect)
+        fw.write(vectString + "\n")
     fw.close()
-
+    
