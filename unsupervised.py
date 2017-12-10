@@ -10,7 +10,8 @@ import util
 import time 
 import kmeans
 from sklearn.metrics import precision_recall_fscore_support
-import naive_bayes as nb
+import naive_bayes_optimized as nb_opt
+import cPickle as pkl
 
 
 
@@ -32,90 +33,85 @@ def filterStopWords(words):
     return filtered
 
 def createWordCountDict(text):
-    wordDict = {}
+    uniqueWords = set()
     words = text.translate(None, string.punctuation).lower().split()
     words = filterStopWords(words)
     for word in words:
-        if word in wordDict:
-            wordDict[word] += 1
-        else:
-            wordDict[word] = 1
-    return wordDict
+        uniqueWords.add(word)
+    return uniqueWords
 
-def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit, conservativeSplit, wordCountList):
+def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit, conservativeSplit, wordCountList, devData, trainLen):
     if startIndex == len(sourceList):
+        #if len(liberalSplit) > 1:# or len(conservativeSplit) < 5:
+        #    return
+        # Ellen Uncomments this
+        #if len(liberalSplit) == 5 or len(conservativeSplit) == 5:
+           
+
+        #Jeff uncomments this
+        #if len(liberalSplit) == 6 or len(conservativeSplit) == 6:
+
+        # natalie uncomments this
+        #if len(liberalSplit) == 4 or len(conservativeSplit) == 4:
         # TO DO
         # calculate hingeLoss by testing on numDev
         # update hingeDict
-        hingeLoss = 0.0
-        classifier = nb.NaiveBayesUnsupervised()
-        print "foundSplit"
-        print liberalSplit
-        print conservativeSplit
+            classifier = nb_opt.NaiveBayes()
+            print "foundSplit"
+            print liberalSplit
+            print conservativeSplit
 
-        #Training Phase
-        print "start weights"
-        for liberalPoint in liberalSplit:
-            data = dataBySource[liberalPoint]
-            for dataPoint in data:
+            #Training Phase
+            print "start weights"
+            for liberalPoint in liberalSplit:
+                data = dataBySource[liberalPoint]
+                for dataPoint in data:
+                    exampleNum = dataPoint[0]
+                    if exampleNum >= trainLen:
+                        continue
+                    wordCount = wordCountList[exampleNum]
+                    classifier.train(-1, wordCount, True)
+            print "cons"
+            for conservativePoint in conservativeSplit:
+                data = dataBySource[conservativePoint]
+                for dataPoint in data:
+                    exampleNum = dataPoint[0]
+                    if exampleNum >= trainLen:
+                        continue
+                    wordCount = wordCountList[exampleNum]
+                    classifier.train(1, wordCount, True)
+            # Dev Phase 
+            numTestCorrect = 0
+            total = len(devData)
+            for i in range(total):
+                dataPoint = devData[i]
+                klass = dataPoint[2]
                 exampleNum = dataPoint[0]
-                if exampleNum >= 100:
-                    continue
-                wordCount = wordCountList[exampleNum]
-                classifier.train(-1, wordCount)
-        print "cons"
-        for conservativePoint in conservativeSplit:
-            data = dataBySource[conservativePoint]
-            for dataPoint in data:
-                exampleNum = dataPoint[0]
-                if exampleNum >= 100:
-                    continue
-                wordCount = wordCountList[exampleNum]
-                classifier.train(1, wordCount)
+                guess = None
+                if exampleNum < len(wordCountList):
+                    guess = classifier.classify(wordCountList[exampleNum], True)
+                    #print "guess " + str(guess)
+                    #print "klass " + str(klass)
 
-        # Find the Losses
-        print "start loss"
-        for liberalPoint in liberalSplit:
-            data = dataBySource[liberalPoint]
-            for dataPoint in data:
-                exampleNum = dataPoint[0]
-                if exampleNum >= 100:
+                else:
+                    print "skip"
                     continue
-                #Phi(x)
-                wordCount = wordCountList[exampleNum]
-                # y
-                y = -1
-                weightsByWord = classifier.getWeights()
-                print wordCount
-                print weightsByWord[-1]
-                hingeLoss += max(1 - util.dotProduct(wordCount, weightsByWord[-1]) * y, 0)
-        print "cons"
-        for conservativePoint in conservativeSplit:
-            data = dataBySource[conservativePoint]
-            for dataPoint in data:
-
-                exampleNum = dataPoint[0]
-                if exampleNum >= 100:
-                    continue
-                #Phi(x)
-                wordCount = wordCountList[exampleNum]
-                # y
-                y = 1
-                weightsByWord = classifier.getWeights()
-                hingeLoss += max(1- util.dotProduct(wordCount, weightsByWord[1]) * y, 0)
-        print "finished"
-        print hingeLoss
-        hingeDict[hingeLoss] = (liberalSplit, conservativeSplit, classifier)
+                if guess == klass:
+                    numTestCorrect += 1
+            accuracy = float(numTestCorrect) / total
+            print "finished"
+            print accuracy
+            hingeDict[accuracy] = (liberalSplit, conservativeSplit, classifier)
     else:
         newLiberal = list(liberalSplit)
         newLiberal.append(sourceList[startIndex])
         newConservative = list(conservativeSplit)
-        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList)
+        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList, devData, trainLen)
 
         newLiberal = list(liberalSplit)
         newConservative = list(conservativeSplit)
         newConservative.append(sourceList[startIndex])
-        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList)
+        findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList, devData, trainLen)
 
 
 #python unsupervised.py ../cs221-data/read-data/ ./labeled_data.txt 
@@ -127,32 +123,52 @@ def main(argv):
     classificationDict = util.createClassDict(argv[2])
     dataList = util.readFiles(argv[1], classificationDict) #if no classificationDict passed in, randomized
 
-    # index in list = exampleNum
-    # value at index = wordcountDict
-    print "hi"
     wordCountList = []
     counter = 0
     for value in dataList:
         wordCountList.append(createWordCountDict(value[1]['text']))
-        counter +=1
-        print counter
-        if counter == 100:
-            break
+        counter += 1
+        #if counter == 10000:
+        #    break
+        if counter % 5000 == 0:
+            print counter
+    print len(wordCountList)
 
-
+    # index in list = exampleNum
+    # value at index = wordcountDict
+    print "hi"
     labeledData, unlabeledData = util.separateLabeledExamples(dataList)
+    
 
+    #print wordCountList[0]
 
+    devLen = len(labeledData) / 2
+    trainLen = len(unlabeledData) / 2
+    devData = []
+    testData = []
+    random.seed(9001)
     random.shuffle(labeledData)
+    random.shuffle(unlabeledData)
+    #print labeledData[0][1]['publication']
+    #print unlabeledData[0][1]['publication']
+    for i in range(len(labeledData)):
+        if i < devLen:
+            devData.append(labeledData[i])
+        else:
+            testData.append(labeledData[i])
+    #print devData
+    #print testData
+    
     print "me"
     # Key = Source
     # Value = List of data points
     sourceList = []
     dataBySource = {}
-    for dataPoint in dataList:
+    for dataPoint in unlabeledData:
         if dataPoint[1]['publication'] in dataBySource:
             dataBySource[dataPoint[1]['publication']].append(dataPoint)
         else:
+            print dataPoint[1]['publication']
             sourceList.append(dataPoint[1]['publication'])
             dataBySource[dataPoint[1]['publication']] = [dataPoint]
     # Key = hinge loss. The smallest key will be the one with the lowest global loss and best assignment
@@ -160,41 +176,41 @@ def main(argv):
     hingeDict = {}
 
     testSourceList = []
-    for i in range(5):
+    for i in range(len(sourceList)):
         testSourceList.append(sourceList[i])
     print testSourceList
     print sourceList
     # "Dev" Phase
-    findBestSplit(hingeDict, testSourceList, 0, dataBySource, [], [], wordCountList)
+    findBestSplit(hingeDict, testSourceList, 0, dataBySource, [], [], wordCountList, devData, trainLen)
     print "finished"
     print hingeDict
     # Find best result from "Dev" Phase
-    minLoss = float('inf')
+    bestKey = float('-inf')
     splitTuple = None
-    for lossKey in hingeDict:
-        if lossKey < minLoss:
-            minLoss = lossKey
-            splitTuple = hingeDict[lossKey]
+    for accuracyKey in hingeDict:
+        if accuracyKey > bestKey:
+            bestKey = accuracyKey
+            splitTuple = hingeDict[accuracyKey]
     print splitTuple
-    print minLoss
+    print bestKey
     # Test Phase
     numTestCorrect = 0
-    total = len(labeledData)
+    total = len(testData)
     for i in range(total):
-        dataPoint = labeledData[i]
-        if dataPoint[0] >= 10:
-            continue
+        dataPoint = testData[i]
         klass = dataPoint[2]
-        guess = None
-        if dataPoint[1]['publication'] in splitTuple[0]:
-            guess = -1
+        exampleNum = dataPoint[0]
+        #print exampleNum
+        if exampleNum < len(wordCountList):
+            guess = splitTuple[2].classify(wordCountList[dataPoint[0]], True)
+            #print guess
         else:
-            guess = 1
-        if klass == guess:
+            print "skip"
+            continue
+        if guess == klass:
             numTestCorrect += 1
-    print "numCorrect: " + str(numTestCorrect) + ' numTotal: ' + str(total) + ' percentage: ' + str(float(numTestCorrect) / total)
+    print "TEST DATA   numCorrect: " + str(numTestCorrect) + ' numTotal: ' + str(total) + ' percentage: ' + str(float(numTestCorrect) / total)
 
 if __name__ == '__main__':
     # To speed up, this loop could be pushed inward, so some calculations could be not
-    for _ in xrange(10):
-        main(sys.argv)
+    main(sys.argv)
