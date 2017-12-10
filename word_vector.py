@@ -10,12 +10,14 @@ import numpy as np
 import cPickle as pkl
 
 class WordVector:
-    def __init__(self, numIters = 20, eta = 0.01):
-        #self.wordVectDict = self.readVectorsFile('../cs221-data/glove.42B.300d.txt')
+    def __init__(self, numArticles, numIters = 20, eta = 0.01):
         self.stopWords = self.readStopWordsFile('./english.stop')
-        self.featureExtractor = getArticleVector
+        self.featureExtractor = self.getArticleFeatures
         self.articleVectorsFileName = "article_word_vectors.txt"
         self.articleVectors = self.readArticleVectorsFile()
+        self.numIters = numIters
+        self.eta = eta
+        self.numArticles = numArticles
 
     def readStopWordsFile(self, fileName):
         contents = []
@@ -34,54 +36,57 @@ class WordVector:
         return filtered
 
     def readArticleVectorsFile(self):
-    	articleVectors = []
-    	articleNum = 0
-        with open(self.articleVectorsFileName, 'rb') as f:
-    		while True:
-		        try:
-		            vect = pkl.load(f)
-		            print vect
-		            articleVectors.append(vect)
-		            articleNum += 1
-		        except EOFError:
-		            break
+        articleVectors = {}
+        articleNum = 0
+        f = open(self.articleVectorsFileName, 'r')
+        numRead = 0
+        for line in f:
+            line = line.strip('\n')
+            parts = line.split(':')
+            if parts[1] == "": 
+            	articleVectors[int(parts[0])] = {}
+            	continue
+            vect = parts[1].split(' ')
+            features = {}
+            for i in xrange(len(vect)):
+                features[i] = float(vect[i])
+            articleVectors[int(parts[0])] = features
+            articleNum += 1
+            numRead += 1
         f.close()
+        print "total num articles: " + str(articleNum)
+        print "first article vect: " + str(articleVectors[0])
         return articleVectors
 
 
-    def getArticleVector(self, example):
-    	return self.articleVectors[example[0]]
+    def getArticleFeatures(self, exampleNum):
+        return self.articleVectors[exampleNum]
+        
 
     def perform_sgd(self, trainExamples):
-        weights = []
+        weights = {}
         #print trainExamples[0]
-        for i in range(self.numIters):
+        for i in xrange(self.numIters):
             print "iteration " + str(i)
             for example in trainExamples:
                 #phi(x)
-                #print "Ex feature vectorized is: " + str(example[1])
-                featureVector = self.featureExtractor(example)
+                featureVector = self.featureExtractor(example[0]) #pass in example #
                 #y
                 yValue = example[2]
                 #calculates phi(x)y
-                for j in xrange(len(featureVector)):
+                for j in featureVector:
                     featureVector[j] *= yValue
 
-                gradientLoss = []
+                gradientLoss = {}
                 #if w dot phi(x)y < 1, we use -phi(x)y (which cancels to just phi(x)y)
-                #if util.dotProduct(weights, featureVector) < 1:
-                dotProduct = sum([weights[i]*featureVector[i] for i in xrange(len(featureVector))])
-                if dotProduct < 1:
+                if util.dotProduct(weights, featureVector) < 1:
                     gradientLoss = featureVector
-                #util.increment(weights, self.eta, gradientLoss)
-                weights = [weights[f] + v * self.eta for f, v in d2.items()]
-        
+                util.increment(weights, self.eta, gradientLoss)
+                
         return weights
 
-
     def classify(self, example, weights):
-        featureVector = self.featureExtractor(example)
-        dotProduct = sum([weights[i]*featureVector[i] for i in xrange(len(featureVector))])
+        dotProduct = util.dotProduct(self.featureExtractor(example[0]), weights)
         if dotProduct >= 0:
             return 1
         else:
