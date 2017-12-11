@@ -13,7 +13,7 @@ class WordVector:
     def __init__(self, numArticles, numIters = 20, eta = 0.01):
         self.stopWords = self.readStopWordsFile('./english.stop')
         self.featureExtractor = self.getArticleFeatures
-        self.articleVectorsFileName = "article_word_vectors.txt"
+        self.articleVectorsFileName = "article_word_vectors_wo_stop_binary_words.txt"
         self.articleVectors = self.readArticleVectorsFile()
         self.numIters = numIters
         self.eta = eta
@@ -54,8 +54,7 @@ class WordVector:
             articleNum += 1
             numRead += 1
         f.close()
-        print "total num articles: " + str(articleNum)
-        print "first article vect: " + str(articleVectors[0])
+        #print "total num articles: " + str(articleNum)
         return articleVectors
 
 
@@ -67,7 +66,7 @@ class WordVector:
         weights = {}
         #print trainExamples[0]
         for i in xrange(self.numIters):
-            print "iteration " + str(i)
+            #print "iteration " + str(i)
             for example in trainExamples:
                 #phi(x)
                 featureVector = self.featureExtractor(example[0]) #pass in example #
@@ -79,7 +78,9 @@ class WordVector:
 
                 gradientLoss = {}
                 #if w dot phi(x)y < 1, we use -phi(x)y (which cancels to just phi(x)y)
-                if util.dotProduct(weights, featureVector) < 1:
+                dp = util.dotProduct(weights, featureVector)
+                #print "DOT PRODUCT: " + str(dp)
+                if dp < 1:
                     gradientLoss = featureVector
                 util.increment(weights, self.eta, gradientLoss)
                 

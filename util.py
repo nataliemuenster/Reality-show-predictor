@@ -149,24 +149,30 @@ def vectorizeArticles(examples):
             wordVectDict[vectTerms[0]] = vectTerms[1:]
             #print "WORD VECTOR FOR " + str(vectTerms[0]) + str(wordVectDict[vectTerms[0]])
     fr.close()
-    #stopWords = readStopWordsFile()
+    stopWords = readStopWordsFile()
     print "about to build article vectors"
-    fw = open("article_word_vectors_debug.txt",'w')
+    fw = open("article_word_vectors_wo_stop_binary_words2.txt",'w')
     num = 0
     
     for ex in examples:
         num += 1
-        if num % 100 == 0: print str(num) + " examples done!"
+        if num % 500 == 0: print str(num) + " examples done!"
         totalVect = []
         words = ex[1]['text'].translate(None, string.punctuation).lower().split()
-        #words = filterStopWords(stopWords, ex[1]['text'])
+        words = filterStopWords(stopWords, words)
+        #print "WORDS W/O SET: " + str(words)
         
+        words = set(words)
+        #print "WORDS NOW: " + str(words)
         for word in words:
             if word in wordVectDict:
                 newVect = wordVectDict[word]
                 totalVect = addVectors(newVect, totalVect)
                 #print "TOTAL VECT combined words = " + str(totalVect)
-        vectString = str(ex[0]) + ":" + ' '.join(str(x) for x in totalVect)
+        normSum = sum(totalVect)
+        normed = [float(i)/normSum for i in totalVect]
+        vectString = str(ex[0]) + ":" + ' '.join(str(x) for x in normed)
+
         #vectString = ' '.join(totalVect)
         fw.write(vectString + "\n")
     fw.close()

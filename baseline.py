@@ -115,7 +115,7 @@ def main(argv):
         for ex in testSet:
             classification = classifier.classify(ex, weights)
             numTotal += 1
-            print classification
+            #print classification
             if classification == ex[2]:
                 numCorrect += 1
             testResults[0].append(ex[2])
@@ -131,6 +131,6 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    #for _ in xrange(10):
-    main(sys.argv)
+    for _ in xrange(10):
+        main(sys.argv)
 
