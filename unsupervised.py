@@ -143,7 +143,7 @@ def main(argv):
     trainLen = len(unlabeledData) / 2
     devData = []
     testData = []
-    random.seed(500)
+    random.seed(217)
     random.shuffle(labeledData)
     random.shuffle(unlabeledData)
     #print labeledData[0][1]['publication']

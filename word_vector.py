@@ -82,11 +82,12 @@ class WordVector:
                 if util.dotProduct(weights, featureVector) < 1:
                     gradientLoss = featureVector
                 util.increment(weights, self.eta, gradientLoss)
-                
+        print weights  
         return weights
 
     def classify(self, example, weights):
         dotProduct = util.dotProduct(self.featureExtractor(example[0]), weights)
+        print dotProduct
         if dotProduct >= 0:
             return 1
         else:

@@ -112,6 +112,17 @@ def main(argv):
         testSet = labeledData[numTrain:] #need dev and test set??
         weights = classifier.perform_sgd(trainSet) #uses text and title of the example
         #dev set -- only classify once training data all inputted
+        for ex in trainSet:
+            classification = classifier.classify(ex, weights)
+            numTotal += 1
+            print classification
+            if classification == ex[2]:
+                numCorrect += 1
+            testResults[0].append(ex[2])
+            testResults[1].append(classification)
+        precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
+        print "Baseline SGD TRAIN scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+
         for ex in testSet:
             classification = classifier.classify(ex, weights)
             numTotal += 1
