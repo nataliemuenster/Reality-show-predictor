@@ -49,8 +49,8 @@ class NaiveBayes:
     rightCalc = math.log(self.docCount[1] + 1)
     rightCalc -= math.log(self.docCount[1] + self.docCount[-1])
 
-    leftDenom = self.wordCounts[-1][0] + len(self.vocab) #3rd index 1 or 0??
-    rightDenom = self.wordCounts[1][0] + len(self.vocab)
+    leftDenom = self.wordCounts[-1][1] + len(self.vocab) #3rd index 1 or 0??
+    rightDenom = self.wordCounts[1][1] + len(self.vocab)
 
     for word in uniqueWords:
         rightCalc += math.log(self.wordCountsForClass[1][word][1] + 1)

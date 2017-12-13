@@ -10,7 +10,7 @@ import numpy as np
 import cPickle as pkl
 
 class WordVector:
-    def __init__(self, numArticles, numIters = 20, eta = 0.01):
+    def __init__(self, numArticles, numIters = 20, eta = 0.02):
         self.stopWords = self.readStopWordsFile('./english.stop')
         self.featureExtractor = self.getArticleFeatures
         self.articleVectorsFileName = "article_word_vectors_wo_stop_binary_words.txt"
@@ -72,23 +72,35 @@ class WordVector:
                 featureVector = self.featureExtractor(example[0]) #pass in example #
                 #y
                 yValue = example[2]
-                #calculates phi(x)y
-                for j in featureVector:
-                    featureVector[j] *= yValue
 
-                gradientLoss = {}
+                margin = 0
+                for key in featureVector:
+                    if weights.has_key(key):
+                        margin += featureVector[key]*weights[key]
+                margin *= yValue
+                if margin < 1:
+                    for key in featureVector:
+                        if weights.has_key(key):
+                            weights[key] = weights[key] + self.eta * yValue * featureVector[key]
+                        else:
+                            weights[key] = self.eta * yValue * featureVector[key]
+                #calculates phi(x)y
+                #for j in featureVector:
+                #    featureVector[j] *= yValue
+
+                #gradientLoss = {}
                 #if w dot phi(x)y < 1, we use -phi(x)y (which cancels to just phi(x)y)
-                dp = util.dotProduct(weights, featureVector)
-                #print "DOT PRODUCT: " + str(dp)
-                if dp < 1:
-                    gradientLoss = featureVector
-                util.increment(weights, self.eta, gradientLoss)
-        print weights  
+                #dp = util.dotProduct(weights, featureVector)
+               # print "DOT PRODUCT: " + str(dp)
+                #if dp < 1:
+                #    gradientLoss = featureVector
+                #util.increment(weights, self.eta, gradientLoss)
+        #print weights  
         return weights
 
     def classify(self, example, weights):
         dotProduct = util.dotProduct(self.featureExtractor(example[0]), weights)
-        print dotProduct
+        #print dotProduct
         if dotProduct >= 0:
             return 1
         else:

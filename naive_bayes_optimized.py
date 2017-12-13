@@ -22,7 +22,7 @@ class NaiveBayes:
     self.nDocs = 0.0
     self.vocab = set() #build vocabulary of unique words for pos and neg classes
     self.stopWords = self.readStopWordsFile('./english.stop')
-    self.n = 1
+    self.n = 2
     self.sgd_feature_list = self.readFeatureFile('./featureList.txt')
     self.sgd_feature_names = self.getFeatureNames()
     self.SGD_features = True
@@ -71,36 +71,45 @@ class NaiveBayes:
       #words = text.translate(None, string.punctuation).lower().split()
       #words = self.filterStopWords(words)
       words = self.get_ngrams(text)
-      uniqueWords = set()
-      for word in words:
-        uniqueWords.add(word)
-
+      #uniqueWords = set()
+      #for word in words:
+      #  uniqueWords.add(word)
+      #print uniqueWords
+      uniqueWords = words
     polarizingWords = set() #will this work??
+    diffAmount = 40
+    if isUnsupervised:
+      diffAmount = 20
     for word in uniqueWords:
         diff = math.fabs(self.wordCountsForClass[1][word][0] - self.wordCountsForClass[-1][word][0])
         #print diff, word, self.wordCountsForClass[1][word][0], self.wordCountsForClass[-1][word][0]
-        if diff > 40:
+        if diff > diffAmount:
           polarizingWords.add(word)
     klass = -1
     leftCalc = math.log(self.docCount[-1] + 1)
     leftCalc -= math.log(self.docCount[1] + self.docCount[-1])
     rightCalc = math.log(self.docCount[1] + 1)
     rightCalc -= math.log(self.docCount[1] + self.docCount[-1])
-
-    leftDenom = self.wordCounts[-1][1] + len(self.vocab) #3rd index 1 or 0??
-    rightDenom = self.wordCounts[1][1] + len(self.vocab)
+    binarized = 0
+    if isUnsupervised:
+      binarized = 1
+    leftDenom = self.wordCounts[-1][binarized] + len(self.vocab) #3rd index 1 or 0??
+    rightDenom = self.wordCounts[1][binarized] + len(self.vocab)
 
     for word in uniqueWords:
+
         multiplier = 1
-        if isUnsupervised:
-          if word in polarizingWords:
+        if word in polarizingWords:
             multiplier = 3
-        else:
-          diff = math.fabs(self.wordCountsForClass[1][word][0] - self.wordCountsForClass[-1][word][0])
-          multiplier = 0
-          if diff <= (self.nDocs * .01): multiplier = .01
-          if diff > (self.nDocs * .01): multiplier = math.log(diff)
-          if (word in self.sgd_feature_names): multiplier *= 3 #tune this?
+        #if isUnsupervised:
+        #  if word in polarizingWords:
+        #    multiplier = 3
+        #else:
+        #  diff = math.fabs(self.wordCountsForClass[1][word][0] - self.wordCountsForClass[-1][word][0])
+        #  multiplier = 1
+        #  if diff <= (self.nDocs * .01): multiplier *= 1.01
+        #  if diff > (self.nDocs * .01): multiplier *= 1 + math.log(diff)
+        #  if (word in self.sgd_feature_names): multiplier *= 3 #tune this?
 
         #multiplier = 1
         #changed from word in polarizing words w. multiplier 3
@@ -109,10 +118,9 @@ class NaiveBayes:
           #diff = math.fabs(self.wordCountsForClass[1][word][0] - self.wordCountsForClass[-1][word][0])
           #multiplier = math.log(diff)
           #print "multiplier: %r" % multiplier
-
-        rightCalc += math.log((self.wordCountsForClass[1][word][1] + 1)**multiplier)
+        rightCalc += math.log((self.wordCountsForClass[1][word][binarized] + 1)**multiplier)
         rightCalc -= math.log(rightDenom)
-        leftCalc += math.log((self.wordCountsForClass[-1][word][1] + 1)**multiplier)
+        leftCalc += math.log((self.wordCountsForClass[-1][word][binarized] + 1)**multiplier)
         leftCalc -= math.log(leftDenom)
 
     if rightCalc > leftCalc:
@@ -155,8 +163,8 @@ class NaiveBayes:
     else:
       words = self.get_ngrams(text)
       if self.SGD_features:
-        sgd_features = self.extract_SGD_features(text)
-        words = words + self.extract_SGD_features(text)
+        #sgd_features = self.extract_SGD_features(text)
+        #words = words + self.extract_SGD_features(text)
         # number of appearances of n-gram in docs with classification klass
         uniqueWords = set()
         for word in words:
