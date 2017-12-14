@@ -1,0 +1,261 @@
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.400000
+	Recall:0.666667
+	F1:0.500000
+numCorrect for fold 0 : 20 numTotal: 32 percentage: 0.625
+Semisupervised NB scores for fold 1:
+	Precision:0.516129
+	Recall:0.592593
+	F1:0.551724
+numCorrect for fold 1 : 18 numTotal: 32 percentage: 0.5625
+Semisupervised NB scores for fold 2:
+	Precision:0.428571
+	Recall:0.617647
+	F1:0.506024
+numCorrect for fold 2 : 17 numTotal: 32 percentage: 0.53125
+Semisupervised NB scores for fold 3:
+	Precision:0.430769
+	Recall:0.622222
+	F1:0.509091
+numCorrect for fold 3 : 19 numTotal: 32 percentage: 0.59375
+Semisupervised NB scores for fold 4:
+	Precision:0.473684
+	Recall:0.600000
+	F1:0.529412
+numCorrect for fold 4 : 22 numTotal: 32 percentage: 0.6875
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.294118
+	Recall:0.625000
+	F1:0.400000
+numCorrect for fold 0 : 17 numTotal: 32 percentage: 0.53125
+Semisupervised NB scores for fold 1:
+	Precision:0.388889
+	Recall:0.636364
+	F1:0.482759
+numCorrect for fold 1 : 17 numTotal: 32 percentage: 0.53125
+Semisupervised NB scores for fold 2:
+	Precision:0.442308
+	Recall:0.605263
+	F1:0.511111
+numCorrect for fold 2 : 18 numTotal: 32 percentage: 0.5625
+Semisupervised NB scores for fold 3:
+	Precision:0.467742
+	Recall:0.568627
+	F1:0.513274
+numCorrect for fold 3 : 21 numTotal: 32 percentage: 0.65625
+Semisupervised NB scores for fold 4:
+	Precision:0.443038
+	Recall:0.583333
+	F1:0.503597
+numCorrect for fold 4 : 18 numTotal: 32 percentage: 0.5625
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.272727
+	Recall:0.272727
+	F1:0.272727
+numCorrect for fold 0 : 16 numTotal: 32 percentage: 0.5
+Semisupervised NB scores for fold 1:
+	Precision:0.538462
+	Recall:0.538462
+	F1:0.538462
+numCorrect for fold 1 : 24 numTotal: 32 percentage: 0.75
+Semisupervised NB scores for fold 2:
+	Precision:0.488372
+	Recall:0.600000
+	F1:0.538462
+numCorrect for fold 2 : 20 numTotal: 32 percentage: 0.625
+Semisupervised NB scores for fold 3:
+	Precision:0.442623
+	Recall:0.562500
+	F1:0.495413
+numCorrect for fold 3 : 13 numTotal: 32 percentage: 0.40625
+Semisupervised NB scores for fold 4:
+	Precision:0.473684
+	Recall:0.600000
+	F1:0.529412
+numCorrect for fold 4 : 23 numTotal: 32 percentage: 0.71875
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.250000
+	Recall:0.333333
+	F1:0.285714
+numCorrect for fold 0 : 12 numTotal: 32 percentage: 0.375
+Semisupervised NB scores for fold 1:
+	Precision:0.375000
+	Recall:0.500000
+	F1:0.428571
+numCorrect for fold 1 : 20 numTotal: 32 percentage: 0.625
+Semisupervised NB scores for fold 2:
+	Precision:0.434783
+	Recall:0.555556
+	F1:0.487805
+numCorrect for fold 2 : 22 numTotal: 32 percentage: 0.6875
+Semisupervised NB scores for fold 3:
+	Precision:0.446154
+	Recall:0.604167
+	F1:0.513274
+numCorrect for fold 3 : 19 numTotal: 32 percentage: 0.59375
+Semisupervised NB scores for fold 4:
+	Precision:0.461538
+	Recall:0.600000
+	F1:0.521739
+numCorrect for fold 4 : 21 numTotal: 32 percentage: 0.65625
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.650000
+	Recall:0.764706
+	F1:0.702703
+numCorrect for fold 0 : 21 numTotal: 32 percentage: 0.65625
+Semisupervised NB scores for fold 1:
+	Precision:0.536585
+	Recall:0.733333
+	F1:0.619718
+numCorrect for fold 1 : 16 numTotal: 32 percentage: 0.5
+Semisupervised NB scores for fold 2:
+	Precision:0.528302
+	Recall:0.700000
+	F1:0.602151
+numCorrect for fold 2 : 22 numTotal: 32 percentage: 0.6875
+Semisupervised NB scores for fold 3:
+	Precision:0.478261
+	Recall:0.673469
+	F1:0.559322
+numCorrect for fold 3 : 17 numTotal: 32 percentage: 0.53125
+Semisupervised NB scores for fold 4:
+	Precision:0.457831
+	Recall:0.633333
+	F1:0.531469
+numCorrect for fold 4 : 17 numTotal: 32 percentage: 0.53125
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.647059
+	Recall:0.687500
+	F1:0.666667
+numCorrect for fold 0 : 21 numTotal: 32 percentage: 0.65625
+Semisupervised NB scores for fold 1:
+	Precision:0.531250
+	Recall:0.653846
+	F1:0.586207
+numCorrect for fold 1 : 19 numTotal: 32 percentage: 0.59375
+Semisupervised NB scores for fold 2:
+	Precision:0.489796
+	Recall:0.615385
+	F1:0.545455
+numCorrect for fold 2 : 16 numTotal: 32 percentage: 0.5
+Semisupervised NB scores for fold 3:
+	Precision:0.500000
+	Recall:0.563636
+	F1:0.529915
+numCorrect for fold 3 : 17 numTotal: 32 percentage: 0.53125
+Semisupervised NB scores for fold 4:
+	Precision:0.453333
+	Recall:0.566667
+	F1:0.503704
+numCorrect for fold 4 : 20 numTotal: 32 percentage: 0.625
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.526316
+	Recall:0.833333
+	F1:0.645161
+numCorrect for fold 0 : 21 numTotal: 32 percentage: 0.65625
+Semisupervised NB scores for fold 1:
+	Precision:0.441176
+	Recall:0.625000
+	F1:0.517241
+numCorrect for fold 1 : 15 numTotal: 32 percentage: 0.46875
+Semisupervised NB scores for fold 2:
+	Precision:0.434783
+	Recall:0.625000
+	F1:0.512821
+numCorrect for fold 2 : 22 numTotal: 32 percentage: 0.6875
+Semisupervised NB scores for fold 3:
+	Precision:0.466667
+	Recall:0.583333
+	F1:0.518519
+numCorrect for fold 3 : 18 numTotal: 32 percentage: 0.5625
+Semisupervised NB scores for fold 4:
+	Precision:0.448718
+	Recall:0.583333
+	F1:0.507246
+numCorrect for fold 4 : 16 numTotal: 32 percentage: 0.5
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.300000
+	Recall:0.230769
+	F1:0.260870
+numCorrect for fold 0 : 15 numTotal: 32 percentage: 0.46875
+Semisupervised NB scores for fold 1:
+	Precision:0.538462
+	Recall:0.518519
+	F1:0.528302
+numCorrect for fold 1 : 24 numTotal: 32 percentage: 0.75
+Semisupervised NB scores for fold 2:
+	Precision:0.550000
+	Recall:0.536585
+	F1:0.543210
+numCorrect for fold 2 : 20 numTotal: 32 percentage: 0.625
+Semisupervised NB scores for fold 3:
+	Precision:0.519231
+	Recall:0.529412
+	F1:0.524272
+numCorrect for fold 3 : 20 numTotal: 32 percentage: 0.625
+Semisupervised NB scores for fold 4:
+	Precision:0.465753
+	Recall:0.566667
+	F1:0.511278
+numCorrect for fold 4 : 16 numTotal: 32 percentage: 0.5
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.454545
+	Recall:0.500000
+	F1:0.476190
+numCorrect for fold 0 : 21 numTotal: 32 percentage: 0.65625
+Semisupervised NB scores for fold 1:
+	Precision:0.500000
+	Recall:0.565217
+	F1:0.530612
+numCorrect for fold 1 : 20 numTotal: 32 percentage: 0.625
+Semisupervised NB scores for fold 2:
+	Precision:0.522727
+	Recall:0.621622
+	F1:0.567901
+numCorrect for fold 2 : 20 numTotal: 32 percentage: 0.625
+Semisupervised NB scores for fold 3:
+	Precision:0.475410
+	Recall:0.617021
+	F1:0.537037
+numCorrect for fold 3 : 17 numTotal: 32 percentage: 0.53125
+Semisupervised NB scores for fold 4:
+	Precision:0.473684
+	Recall:0.600000
+	F1:0.529412
+numCorrect for fold 4 : 18 numTotal: 32 percentage: 0.5625
+semi-supervised
+Semisupervised NB scores for fold 0:
+	Precision:0.461538
+	Recall:0.600000
+	F1:0.521739
+numCorrect for fold 0 : 21 numTotal: 32 percentage: 0.65625
+Semisupervised NB scores for fold 1:
+	Precision:0.481481
+	Recall:0.520000
+	F1:0.500000
+numCorrect for fold 1 : 17 numTotal: 32 percentage: 0.53125
+Semisupervised NB scores for fold 2:
+	Precision:0.463415
+	Recall:0.527778
+	F1:0.493506
+numCorrect for fold 2 : 19 numTotal: 32 percentage: 0.59375
+Semisupervised NB scores for fold 3:
+	Precision:0.452830
+	Recall:0.470588
+	F1:0.461538
+numCorrect for fold 3 : 15 numTotal: 32 percentage: 0.46875
+Semisupervised NB scores for fold 4:
+	Precision:0.417910
+	Recall:0.466667
+	F1:0.440945
+numCorrect for fold 4 : 17 numTotal: 32 percentage: 0.53125
+Error Bar: (0.50140, 0.66735) with average accuracy 0.58437
