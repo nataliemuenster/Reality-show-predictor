@@ -10,7 +10,7 @@ import numpy as np
 import cPickle as pkl
 
 class WordVector:
-    def __init__(self, numArticles, numIters = 20, eta = 0.02):
+    def __init__(self, numArticles, numIters = 20, eta = .02):
         self.stopWords = self.readStopWordsFile('./english.stop')
         self.featureExtractor = self.getArticleFeatures
         self.articleVectorsFileName = "article_word_vectors_wo_stop_binary_words.txt"

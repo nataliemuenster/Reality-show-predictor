@@ -10,6 +10,7 @@ import naive_bayes as nb
 import naive_bayes_optimized as nb_opt
 import sgd as sgd
 import semisupervised as ss
+import word_vector as wv
 import util
 from sklearn.metrics import precision_recall_fscore_support
 
@@ -114,9 +115,9 @@ def main(argv):
             classifier = nb_opt.NaiveBayes()
             #classifier.setN(2)
             for dataPoint in trainSet:
-                classifier.train(dataPoint[2], dataPoint[1]['text'])
+                classifier.train(dataPoint[2], dataPoint[1]['text'], True)
             for dataPoint in testSet:
-                classification = classifier.classify(dataPoint[1]['text'])
+                classification = classifier.classify(dataPoint[1]['text'], True)
                 numTotal += 1
                 #print classification
                 if classification == dataPoint[2]:
@@ -125,31 +126,73 @@ def main(argv):
                 testResults[1].append(classification)
             precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
             print "Baseline NB TEST scores for fold %d:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (i, precision, recall, fscore)
-            print "numCorrect: %d numTotal: %d Accuracy: %d" % (numCorrect, numTotal, (float(numCorrect)/float(numTotal)))
+            acc = str(float(numCorrect) / numTotal)
+            print "numCorrect: %d numTotal: %d Accuracy: %s" % (numCorrect, numTotal, acc)
             results.append(numCorrect)
 
     elif argv[3] == "sgd":
         #classifier = sgd.SGD(20) #(numIterations, eta)
         for i, fold in enumerate(folds):
-            classifier = sgd.SGD(20)
+            classifier = sgd.SGD(50)
             numTotal = 0
             numCorrect = 0
             trainSet = getTrainFolds(folds, i) #training set
             testSet = getTestFolds(folds, i) #need dev and test set??
             weights = classifier.perform_sgd(trainSet) #uses text and title of the example
             #dev set -- only classify once training data all inputted
+            for ex in trainSet:
+                classification = classifier.classify(ex[1], weights)
+                numTotal += 1
+                if classification == ex[2]:
+                    numCorrect += 1
+            print "TRAIN: " + str(float(numCorrect) / numTotal)
+            numCorrect = 0
+            numTotal = 0
             for ex in testSet:
                 classification = classifier.classify(ex[1], weights)
                 numTotal += 1
-                print classification
+                #print classification
                 if classification == ex[2]:
                     numCorrect += 1
                 testResults[0].append(ex[2])
                 testResults[1].append(classification)
             precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
             print "Baseline SGD TEST scores for fold %d:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (i, precision, recall, fscore)
+            acc = str(float(numCorrect)/numTotal)
+            print "numCorrect: %d numTotal: %d Accuracy: %s" % (numCorrect, numTotal, acc)
             results.append(numCorrect)
+    elif argv[3] == "wv":
+        for i, fold in enumerate(folds):
 
+            classifier = wv.WordVector(len(dataList),150) #(numArticles, numIterations, eta)
+            numCorrect = 0
+            numTotal = 0
+            trainSet = getTrainFolds(folds, i) #training set
+            testSet = getTestFolds(folds, i) #need dev and test set??
+            weights = classifier.perform_sgd(trainSet) #uses text and title of the example
+        #dev set -- only classify once training data all inputted
+        
+            for ex in trainSet:
+                classification = classifier.classify(ex, weights)
+                numTotal += 1
+                #print classification
+                if classification == ex[2]:
+                    numCorrect += 1
+            print "TRAIN: " + str(float(numCorrect) / numTotal)
+            numCorrect = 0
+            numTotal = 0
+            for ex in testSet:
+                classification = classifier.classify(ex, weights)
+                numTotal += 1
+                #print classification
+                if classification == ex[2]:
+                    numCorrect += 1
+                testResults[0].append(ex[2])
+                testResults[1].append(classification)
+            print float(numCorrect) / numTotal
+            precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
+            print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+            results.append(numCorrect)
     else:
         print >> sys.stderr, 'Usage: python readDate.py <directory name> <labels file name> <algorithm> ("nb" or "sgd")'
 

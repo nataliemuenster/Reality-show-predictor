@@ -165,12 +165,12 @@ def main(argv):
         print >> sys.stderr, 'Usage: python readDate.py <directory name> <labels file name> <algorithm> ("nb" or "sgd")'
 
     print "numCorrect: " + str(numCorrect) + ' numTotal: ' + str(numTotal) + ' percentage: ' + str(float(numCorrect) / numTotal)
-    return float(numCorrect) / numTotal
+    #return float(numCorrect) / numTotal
 
 
 if __name__ == '__main__':
-    score = 0.0
+    #score = 0.0
     for _ in xrange(10):
-        score += main(sys.argv)
-    print score / 10
+        main(sys.argv)
+    #print score / 10
 
