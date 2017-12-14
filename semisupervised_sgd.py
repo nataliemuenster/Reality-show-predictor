@@ -22,8 +22,17 @@ def train_semisupervised_sgd(trainSet, unlabeledData, classifier):
     random.shuffle(unlabeledData)
     unlabeledLiberal = 0
     unlabeledConservative = 0
-    everyTenFlag = (len(unlabeledData) / 1000) % 50
-    for i in range(len(unlabeledData) / 1000): # Use 1% of data for now
+    #everyTenFlag = (len(unlabeledData) / 10) % 100
+    stopTrain = 10
+    for i in range(len(unlabeledData) / 100): # Use 1% of data for now
+        if i == 100:
+            stopTrain = 50
+        if i == 500:
+            stopTrain = 100
+        if i == 1500:
+            stopTrain = 1000
+        if i == 4500:
+            stopTrain = 2500
         #print "Ex being passed in unlabeled classify is: " + str(unlabeledData[i][1])
         classification = classifier.classify(unlabeledData[i][1], weights)
         if classification == -1:
@@ -31,10 +40,10 @@ def train_semisupervised_sgd(trainSet, unlabeledData, classifier):
         else:
             unlabeledConservative += 1
         subsequentTrainSet.append((unlabeledData[i][0], unlabeledData[i][1], classification))
-        if (i + 1) % 50 == 0:
+        if (i + 1) % stopTrain == 0:
             weights = classifier.perform_sgd(subsequentTrainSet)
-    if not everyTenFlag == 0:
-        weights = classifier.perform_sgd(subsequentTrainSet)
+    #if not everyTenFlag == 0:
+    #    weights = classifier.perform_sgd(subsequentTrainSet)
     return weights
 
 

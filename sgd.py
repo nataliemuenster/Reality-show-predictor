@@ -8,7 +8,7 @@ from nltk import pos_tag
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 class SGD:
-    def __init__(self, numIters = 20, eta=.01):
+    def __init__(self, numIters = 20, eta=.05):
         self.featureExtractor = self.extractWordFeatures
         self.numIters = numIters
         self.eta = eta
@@ -89,22 +89,34 @@ class SGD:
         weights = {}
         #print trainExamples[0]
         for i in range(self.numIters):
-            print "iteration " + str(i)
+           # print "iteration " + str(i)
             for example in trainExamples:
                 #phi(x)
                 #print "Ex feature vectorized is: " + str(example[1])
                 featureVector = self.featureExtractor(example[1])
                 #y
                 yValue = example[2]
-                #calculates phi(x)y
+                margin = 0
                 for key in featureVector:
-                    featureVector[key] *= yValue
+                    if weights.has_key(key):
+                        margin += featureVector[key]*weights[key]
+                margin *= yValue
+                if margin < 1:
+                    for key in featureVector:
+                        if weights.has_key(key):
+                            weights[key] = weights[key] + self.eta * yValue * featureVector[key]
+                        else:
+                            weights[key] = self.eta * yValue * featureVector[key]
 
-                gradientLoss = {}
+                #calculates phi(x)y
+                #for key in featureVector:
+                #    featureVector[key] *= yValue
+
+                #gradientLoss = {}
                 #if w dot phi(x)y < 1, we use -phi(x)y (which cancels to just phi(x)y)
-                if util.dotProduct(weights, featureVector) < 1:
-                    gradientLoss = featureVector
-                util.increment(weights, self.eta, gradientLoss)
+                #if util.dotProduct(weights, featureVector) < 1:
+                #    gradientLoss = featureVector
+                #util.increment(weights, self.eta, gradientLoss)
         return weights
 
     def classify(self, example, weights):

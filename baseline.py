@@ -46,7 +46,23 @@ def main(argv):
     numCorrect = 0
     numTotal = 0
     testResults = ([],[]) #Y, prediction
-
+    #if argv[3] == 'wv':
+    #    klassList = []
+    #    newLabeledList = []
+    #    with open('./lol.txt', 'r') as file:
+    #        counter = 1
+    #        for line in file:
+    #            #print line
+    #            num = int(line.split(":")[0])
+    #            for dataPoint in labeledData:
+    #                if dataPoint[0] == num:
+    #                    newLabeledList.append(dataPoint)
+    #                    break
+    #            if counter == numTrain:
+    #                random.shuffle(newLabeledList)
+    #            counter += 1
+    #    labeledData = newLabeledList
+        #print labeledData
     if argv[3] == "majority":
         #classify every example the same
         trainSet = labeledData[:numTrain]
@@ -90,10 +106,19 @@ def main(argv):
         testSet = labeledData[numTrain:] #need dev and test set??
         weights = classifier.perform_sgd(trainSet) #uses text and title of the example
         #dev set -- only classify once training data all inputted
+        for ex in trainSet:
+            classification = classifier.classify(ex[1], weights)
+            numTotal += 1
+            #print classification
+            if classification == ex[2]:
+                numCorrect += 1
+        print "TRAIN: " + str(float(numCorrect) / numTotal)
+        numCorrect = 0
+        numTotal = 0
         for ex in testSet:
             classification = classifier.classify(ex[1], weights)
             numTotal += 1
-            print classification
+            #print classification
             if classification == ex[2]:
                 numCorrect += 1
             testResults[0].append(ex[2])
@@ -107,22 +132,24 @@ def main(argv):
         return
 
     elif argv[3] == "wv":
-        classifier = wv.WordVector(len(dataList),20) #(numArticles, numIterations, eta)
+        classifier = wv.WordVector(len(dataList),150) #(numArticles, numIterations, eta)
         trainSet = labeledData[:numTrain] #training set
         testSet = labeledData[numTrain:] #need dev and test set??
         weights = classifier.perform_sgd(trainSet) #uses text and title of the example
         #dev set -- only classify once training data all inputted
+        numCorrect = 0
+        numTotal = 0
         for ex in trainSet:
             classification = classifier.classify(ex, weights)
             numTotal += 1
-            print classification
+            #print classification
             if classification == ex[2]:
                 numCorrect += 1
-            testResults[0].append(ex[2])
-            testResults[1].append(classification)
-        precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
-        print "Baseline SGD TRAIN scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
-
+        print "TRAIN: " + str(float(numCorrect) / numTotal)
+        #precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
+        #print "Baseline SGD TRAIN scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+        numCorrect = 0
+        numTotal = 0
         for ex in testSet:
             classification = classifier.classify(ex, weights)
             numTotal += 1
@@ -131,17 +158,19 @@ def main(argv):
                 numCorrect += 1
             testResults[0].append(ex[2])
             testResults[1].append(classification)
+        print float(numCorrect) / numTotal
         precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
         print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
-
     else:
         print >> sys.stderr, 'Usage: python readDate.py <directory name> <labels file name> <algorithm> ("nb" or "sgd")'
 
     print "numCorrect: " + str(numCorrect) + ' numTotal: ' + str(numTotal) + ' percentage: ' + str(float(numCorrect) / numTotal)
-
+    return float(numCorrect) / numTotal
 
 
 if __name__ == '__main__':
+    score = 0.0
     for _ in xrange(10):
-        main(sys.argv)
+        score += main(sys.argv)
+    print score / 10
 
