@@ -3,7 +3,6 @@ import math
 import string
 import util
 import re
-#import sgd
 from nltk import pos_tag
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
@@ -30,11 +29,11 @@ class NaiveBayes:
   def readFeatureFile(self, fileName):
     features = []
     f = open(fileName) 
-    for line in f: #need to remove endline char from each line??
+    for line in f:
         keyword, regexes = line.split(', ')
         features.append((keyword, regexes[:-1])) #get rid of newline char
     f.close()
-    return features #('\n'.join(contents)).split()
+    return features
 
   def getFeatureNames(self):
     featureNames = set()
@@ -76,13 +75,12 @@ class NaiveBayes:
       #  uniqueWords.add(word)
       #print uniqueWords
       uniqueWords = words
-    polarizingWords = set() #will this work??
+    polarizingWords = set() 
     diffAmount = 40
     if isUnsupervised:
       diffAmount = 20
     for word in uniqueWords:
         diff = math.fabs(self.wordCountsForClass[1][word][0] - self.wordCountsForClass[-1][word][0])
-        #print diff, word, self.wordCountsForClass[1][word][0], self.wordCountsForClass[-1][word][0]
         if diff > diffAmount:
           polarizingWords.add(word)
     klass = -1
@@ -93,7 +91,7 @@ class NaiveBayes:
     binarized = 0
     if isUnsupervised:
       binarized = 1
-    leftDenom = self.wordCounts[-1][binarized] + len(self.vocab) #3rd index 1 or 0??
+    leftDenom = self.wordCounts[-1][binarized] + len(self.vocab)
     rightDenom = self.wordCounts[1][binarized] + len(self.vocab)
 
     for word in uniqueWords:

@@ -8,8 +8,7 @@ import csv
 import string
 import naive_bayes as nb
 import naive_bayes_optimized as nb_opt
-import sgd as sgd
-import semisupervised as ss
+import domain_specific as ds
 import word_vector as wv
 import util
 from sklearn.metrics import precision_recall_fscore_support
@@ -56,10 +55,10 @@ def getTrainFolds(folds, testIndex=0):
     return trainFolds
 
 #run cross_validation with: python cross_validation.py <directory name of data> <file name of classifications>
-#python cross_validation.py ../cs221-data/read-data/ ./labeled_data.txt nb/sgd 
+#python cross_validation.py ../cs221-data/read-data/ ./labeled_data.txt nb/ds
 def main(argv):
     if len(argv) < 4:
-        print >> sys.stderr, 'Usage: python baseline.py <data directory name> <labels file name> <algorithm>'
+        print >> sys.stderr, 'Usage: python cross_validation.py <data directory name> <labels file name> <algorithm>'
         sys.exit(1)
     classificationDict = util.createClassDict(argv[2])
     dataList = util.readFiles(argv[1], classificationDict) #if no classificationDict passed in, randomized
@@ -130,10 +129,10 @@ def main(argv):
             print "numCorrect: %d numTotal: %d Accuracy: %s" % (numCorrect, numTotal, acc)
             results.append(numCorrect)
 
-    elif argv[3] == "sgd":
-        #classifier = sgd.SGD(20) #(numIterations, eta)
+    elif argv[3] == "ds":
+        #classifier = ds.LinearClassifier(20) #(numIterations, eta)
         for i, fold in enumerate(folds):
-            classifier = sgd.SGD(50)
+            classifier = ds.LinearClassifier(50)
             numTotal = 0
             numCorrect = 0
             trainSet = getTrainFolds(folds, i) #training set
@@ -157,7 +156,7 @@ def main(argv):
                 testResults[0].append(ex[2])
                 testResults[1].append(classification)
             precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
-            print "Baseline SGD TEST scores for fold %d:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (i, precision, recall, fscore)
+            print "Baseline domain specific TEST scores for fold %d:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (i, precision, recall, fscore)
             acc = str(float(numCorrect)/numTotal)
             print "numCorrect: %d numTotal: %d Accuracy: %s" % (numCorrect, numTotal, acc)
             results.append(numCorrect)
@@ -191,10 +190,10 @@ def main(argv):
                 testResults[1].append(classification)
             print float(numCorrect) / numTotal
             precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
-            print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+            print "Baseline domain specific TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
             results.append(numCorrect)
     else:
-        print >> sys.stderr, 'Usage: python readDate.py <directory name> <labels file name> <algorithm> ("nb" or "sgd")'
+        print >> sys.stderr, 'Usage: python readDate.py <directory name> <labels file name> <algorithm> ("nb" or "ds")'
 
     average = sum(results) / float(len(folds))
     print "Average numCorrect: " + str(average) + " numTotal: " + str(numTotal) + " percentage: " + str(float(average) / float(numTotal))

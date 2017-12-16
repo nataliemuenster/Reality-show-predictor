@@ -64,12 +64,10 @@ class WordVector:
 
     def perform_sgd(self, trainExamples):
         weights = {}
-        #print trainExamples[0]
         for i in xrange(self.numIters):
-            #print "iteration " + str(i)
             for example in trainExamples:
                 #phi(x)
-                featureVector = self.featureExtractor(example[0]) #pass in example #
+                featureVector = self.featureExtractor(example[0]) #pass in example number
                 #y
                 yValue = example[2]
 
@@ -84,23 +82,10 @@ class WordVector:
                             weights[key] = weights[key] + self.eta * yValue * featureVector[key]
                         else:
                             weights[key] = self.eta * yValue * featureVector[key]
-                #calculates phi(x)y
-                #for j in featureVector:
-                #    featureVector[j] *= yValue
-
-                #gradientLoss = {}
-                #if w dot phi(x)y < 1, we use -phi(x)y (which cancels to just phi(x)y)
-                #dp = util.dotProduct(weights, featureVector)
-               # print "DOT PRODUCT: " + str(dp)
-                #if dp < 1:
-                #    gradientLoss = featureVector
-                #util.increment(weights, self.eta, gradientLoss)
-        #print weights  
         return weights
 
     def classify(self, example, weights):
         dotProduct = util.dotProduct(self.featureExtractor(example[0]), weights)
-        #print dotProduct
         if dotProduct >= 0:
             return 1
         else:
