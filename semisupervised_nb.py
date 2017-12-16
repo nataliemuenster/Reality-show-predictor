@@ -8,23 +8,22 @@ import csv
 import string
 import naive_bayes as nb
 import naive_bayes_optimized as nb_opt
-import semisupervised as ss
 import util
 import time 
 import cross_validation as cv
 from sklearn.metrics import precision_recall_fscore_support
 
 def train_semisupervised_nb(trainSet, unlabeledData):
-    secondNB = nb_opt.NaiveBayes()
+    secondNB = nb.NaiveBayes()
     for i, dataPoint in enumerate(trainSet):
-        secondNB.train(dataPoint[2], dataPoint[1]['text'], True)
+        secondNB.train(dataPoint[2], dataPoint[1]['text'])
     random.shuffle(unlabeledData)
     unlabeledLiberal = 0
     unlabeledConservative = 0
-    for i in range(len(unlabeledData)/10): #only use 1% of the full unlabeled dataset
+    for i in range(len(unlabeledData)/ 2): #only use 50% of the full unlabeled dataset
         dataPoint = unlabeledData[i]
-        classification = secondNB.classify(dataPoint[1]['text'], True)
-        secondNB.train(classification, dataPoint[1]['text'], True)
+        classification = secondNB.classify(dataPoint[1]['text'])
+        secondNB.train(classification, dataPoint[1]['text'])
         #print i
         #print classification
         if classification == -1:
@@ -84,7 +83,7 @@ def main(argv):
         numCorrect = 0
         secondNB = train_semisupervised_nb(trainSet, unlabeledData)
         for dataPoint in testSet:
-            classification = secondNB.classify(dataPoint[1]['text'], True)
+            classification = secondNB.classify(dataPoint[1]['text'])
             numTotal += 1
             #print classification
             if classification == dataPoint[2]:

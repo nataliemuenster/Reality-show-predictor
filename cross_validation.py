@@ -9,7 +9,6 @@ import string
 import naive_bayes as nb
 import naive_bayes_optimized as nb_opt
 import sgd as sgd
-import semisupervised as ss
 import word_vector as wv
 import util
 from sklearn.metrics import precision_recall_fscore_support
