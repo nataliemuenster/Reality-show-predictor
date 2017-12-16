@@ -7,7 +7,7 @@ import os
 import csv
 import string
 import naive_bayes as nb
-import naive_bayes_optimized as nb_optss
+import naive_bayes_optimized as nb_opt
 import util
 import time 
 import cross_validation as cv
