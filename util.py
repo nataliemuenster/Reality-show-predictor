@@ -11,7 +11,7 @@ import string
 import cPickle as pkl
 
 
-
+#creates a dictionary mapping all labeled articles to the labels indicated in the specified file
 def createClassDict(classificationsFile):
 	classDict = {} #sparseVector
 	with open(classificationsFile, 'r') as file:
@@ -21,14 +21,14 @@ def createClassDict(classificationsFile):
 	return classDict
 
 #directoryName = "../cs221-data/read-data/"
+#reads and pre-processes all the articles
 def readFiles(directoryName, classificationDict = {}):
 	dataList = []
 
 	firstLine = True
-	#'../cs221-data/read-data/':
 	csv.field_size_limit(sys.maxsize)
 	exampleNum = 0 #examples are zero-indexed
-	labeledExNums = [exNum for exNum in classificationDict] #what happens if None?
+	labeledExNums = [exNum for exNum in classificationDict]
 	for fileName in os.listdir(directoryName):
 		if fileName == '.DS_Store':
 			continue
@@ -46,7 +46,7 @@ def readFiles(directoryName, classificationDict = {}):
 				if firstLine:
 					firstLine = False
 				else:
-					#balances data set a bit more
+					#balances data set
 					if line[3] == 'publication' or line[3] == 'Vox' or line[3] == 'Washington Post' or line[3] == 'Reuters':
 						continue
 					fullText = line[2] + ' ' + line[9].replace('\n', '')
@@ -63,7 +63,7 @@ def readFiles(directoryName, classificationDict = {}):
 	return dataList
 
 
-def separateLabeledExamples(dataList): #could use classificationDict here instead
+def separateLabeledExamples(dataList):
 	labeledExamples = [] #no dict/sparse vector needed
 	unlabeledExamples = []
 	for ex in dataList:
@@ -82,8 +82,8 @@ def readStopWordsFile():
     f.close()
     return ('\n'.join(contents)).split()
 
+#Filters stop words
 def filterStopWords(stopWords, words):
-    """Filters stop words."""
     filtered = []
     for word in words:
       if not word in stopWords and word.strip() != '':
@@ -113,41 +113,24 @@ def dotProduct(d1, d2):
 
 def addVectors(a,b):
     if len(a) < len(b):
-        #c = list(b)
         c = [float(a[i]) + float(b[i]) for i in xrange(len(a))]
-        #c[:len(a)] += a
         for j in xrange(len(a), len(b)):
 	        c.append(float(b[j]))
         return c
     else:
-        #c = list(a)
-        #c[:len(b)] += b
         c = [float(a[i]) + float(b[i]) for i in xrange(len(b))]
-        #c[:len(a)] += a
         for j in xrange(len(b), len(a)):
 	        c.append(float(a[j]))
         return c
 
-def incrementVectors(a, scale, b):
-    #[weights[f] + v * self.eta for f, v in gradientLoss.items()]
-    if len(a) < len(b):
-        c = list(b)
-        for i in xrange(len(c)):
-            c[i] *= scale
-        c[:len(a)] += a
-        return c
-    else:
-        c = list(a)
-        c[:len(b)] += b*scale
-        return c
-
+#Builds dictionary of pre-trained word vectors. Accesses this dict to get word vectors of the words 
+#for each article and normalize to get the article's feature vector.
 def vectorizeArticles(examples):
     wordVectDict = {}
     fr = open("../cs221-data/glove.6B.50d.txt", 'rb') 
     for line in fr:
             vectTerms = line.split()
             wordVectDict[vectTerms[0]] = vectTerms[1:]
-            #print "WORD VECTOR FOR " + str(vectTerms[0]) + str(wordVectDict[vectTerms[0]])
     fr.close()
     stopWords = readStopWordsFile()
     print "about to build article vectors"
@@ -160,20 +143,16 @@ def vectorizeArticles(examples):
         totalVect = []
         words = ex[1]['text'].translate(None, string.punctuation).lower().split()
         words = filterStopWords(stopWords, words)
-        #print "WORDS W/O SET: " + str(words)
         
         words = set(words)
-        #print "WORDS NOW: " + str(words)
         for word in words:
             if word in wordVectDict:
                 newVect = wordVectDict[word]
                 totalVect = addVectors(newVect, totalVect)
-                #print "TOTAL VECT combined words = " + str(totalVect)
         normSum = sum(totalVect)
         normed = [float(i)/normSum for i in totalVect]
         vectString = str(ex[0]) + ":" + ' '.join(str(x) for x in normed)
 
-        #vectString = ' '.join(totalVect)
         fw.write(vectString + "\n")
     fw.close()
     

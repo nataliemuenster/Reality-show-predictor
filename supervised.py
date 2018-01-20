@@ -8,7 +8,7 @@ import csv
 import string
 import naive_bayes as nb
 import naive_bayes_optimized as nb_opt
-import sgd as sgd
+import domain_specific as ds
 import word_vector as wv
 import util
 from sklearn.metrics import precision_recall_fscore_support
@@ -30,14 +30,14 @@ def get_unigrams(text):
 		unigrams[word][1] = math.log(unigrams[word][0]) - math.log(len(textList))
 	return unigrams
 
-#run baseline with: python baseline.py <directory name of data> <file name of classifications>
-#python baseline.py ../cs221-data/read-data/ ./labeled_data.txt majority/nb/sgd/wv
+#run supervised with: python supervised.py <directory name of data> <file name of classifications>
+#python supervised.py ../cs221-data/read-data/ ./labeled_data.txt majority/nb/ds/wv
 def main(argv):
     if len(argv) < 4:
-        print >> sys.stderr, 'Usage: python baseline.py <data directory name> <labels file name> <algorithm>'
+        print >> sys.stderr, 'Usage: python supervised.py <data directory name> <labels file name> <algorithm>'
         sys.exit(1)
     classificationDict = util.createClassDict(argv[2])
-    dataList = util.readFiles(argv[1], classificationDict) #if no classificationDict passed in, randomized
+    dataList = util.readFiles(argv[1], classificationDict)
     labeledData, unlabeledData = util.separateLabeledExamples(dataList) 
     
     random.shuffle(labeledData)
@@ -99,10 +99,10 @@ def main(argv):
         precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
         print "Baseline NB TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
 
-    elif argv[3] == "sgd":
-        classifier = sgd.SGD(20) #(numIterations, eta)
+    elif argv[3] == "ds":
+        classifier = ds.LinearClassifier(20) #(numIterations, eta)
         trainSet = labeledData[:numTrain] #training set
-        testSet = labeledData[numTrain:] #need dev and test set??
+        testSet = labeledData[numTrain:]
         weights = classifier.perform_sgd(trainSet) #uses text and title of the example
         #dev set -- only classify once training data all inputted
         for ex in trainSet:
@@ -123,7 +123,7 @@ def main(argv):
             testResults[0].append(ex[2])
             testResults[1].append(classification)
         precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
-        print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+        print "Baseline domain specific TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
 
     #load pretrained word vector data and store article vectors. Only needd to be run once ever as preprocessing.
     elif argv[3] == "load_wv":
@@ -133,7 +133,7 @@ def main(argv):
     elif argv[3] == "wv":
         classifier = wv.WordVector(len(dataList),150) #(numArticles, numIterations, eta)
         trainSet = labeledData[:numTrain] #training set
-        testSet = labeledData[numTrain:] #need dev and test set??
+        testSet = labeledData[numTrain:] 
         weights = classifier.perform_sgd(trainSet) #uses text and title of the example
         #dev set -- only classify once training data all inputted
         numCorrect = 0
@@ -146,7 +146,7 @@ def main(argv):
                 numCorrect += 1
         print "TRAIN: " + str(float(numCorrect) / numTotal)
         #precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
-        #print "Baseline SGD TRAIN scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+        #print "Baseline domain specific TRAIN scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
         numCorrect = 0
         numTotal = 0
         for ex in testSet:
@@ -159,9 +159,9 @@ def main(argv):
             testResults[1].append(classification)
         print float(numCorrect) / numTotal
         precision,recall,fscore,support = precision_recall_fscore_support(testResults[0], testResults[1], average='binary')
-        print "Baseline SGD TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
+        print "Baseline domain specific TEST scores:\n\tPrecision:%f\n\tRecall:%f\n\tF1:%f" % (precision, recall, fscore)
     else:
-        print >> sys.stderr, 'Usage: python readDate.py <directory name> <labels file name> <algorithm> ("nb" or "sgd")'
+        print >> sys.stderr, 'Usage: python readDate.py <directory name> <labels file name> <algorithm> ("nb" or "ds")'
 
     print "numCorrect: " + str(numCorrect) + ' numTotal: ' + str(numTotal) + ' percentage: ' + str(float(numCorrect) / numTotal)
     #return float(numCorrect) / numTotal

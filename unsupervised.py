@@ -111,8 +111,8 @@ def findBestSplit(hingeDict, sourceList, startIndex, dataBySource, liberalSplit,
         findBestSplit(hingeDict, sourceList, startIndex + 1, dataBySource, newLiberal, newConservative, wordCountList, devData, trainLen)
 
 
-#python unsupervised.py ../cs221-data/read-data/ ./labeled_data.txt 
-# Currently Naive Bayes specific, could be generalized
+#command: python unsupervised.py ../cs221-data/read-data/ ./labeled_data.txt 
+#Currently Naive Bayes specific, could be generalized
 def main(argv):
     if len(argv) < 3:
         print >> sys.stderr, 'Usage: python unsupervised.py <data directory name> <labels file name>'
@@ -125,8 +125,6 @@ def main(argv):
     for value in dataList:
         wordCountList.append(createWordCountDict(value[1]['text']))
         counter += 1
-        #if counter == 10000:
-        #    break
         if counter % 5000 == 0:
             print counter
     print len(wordCountList)
